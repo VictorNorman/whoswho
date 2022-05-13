@@ -1,0 +1,7 @@
+{
+  "name": "whoswho",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
