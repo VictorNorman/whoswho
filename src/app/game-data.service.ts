@@ -14,7 +14,8 @@ export class GameDataService {
 
   private chosenGameMode: string = null;
 
-  constructor() { }
+  constructor() {
+  }
 
   public getGameModes(): string[] {
     return GAME_MODES;
@@ -22,7 +23,6 @@ export class GameDataService {
 
   public setGameMode(mode: string): void {
     this.chosenGameMode = mode;
-    // console.log('chosenGameMode = ', this.chosenGameMode);
   }
 
   public getGameMode(): string {

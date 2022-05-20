@@ -7,6 +7,7 @@ import { GameDataService } from '../game-data.service';
   styleUrls: ['./choose-mode.page.scss'],
 })
 export class ChooseModePage implements OnInit {
+  public modeChosen = false;
 
   constructor(private gameDataSvc: GameDataService) { }
 
@@ -18,7 +19,7 @@ export class ChooseModePage implements OnInit {
   }
 
   public gameModeSelected(event): void {
-    console.log(event.detail.value);
+    this.modeChosen = true;
     this.gameDataSvc.setGameMode(event.detail.value);
   }
 
