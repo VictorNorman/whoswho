@@ -15,6 +15,10 @@ const routes: Routes = [
     path: 'choose-mode',
     loadChildren: () => import('./choose-mode/choose-mode.module').then( m => m.ChooseModePageModule)
   },
+  {
+    path: 'summary',
+    loadChildren: () => import('./summary/summary.module').then( m => m.SummaryPageModule)
+  },
 ];
 
 @NgModule({

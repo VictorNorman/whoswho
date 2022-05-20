@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { GameDataService } from '../game-data.service';
 
@@ -21,7 +22,8 @@ export class QuizPage {
   public guessIsCorrect = false;
 
   constructor(public toastCtrlr: ToastController,
-    public gameDataSvc: GameDataService) { }
+    public gameDataSvc: GameDataService,
+    private router: Router) { }
 
   async showHint() {
     const toast = await this.toastCtrlr.create({
@@ -38,6 +40,13 @@ export class QuizPage {
       duration: 2000,
     });
     toast.present();
+    if (!this.gameDataSvc.isEndOfQuiz()) {
+      this.gameDataSvc.goToNextPerson();
+      this.guessIsCorrect = false;
+      this.guess = '';
+    } else {
+      this.router.navigateByUrl('summary');
+    }
   }
 
 }

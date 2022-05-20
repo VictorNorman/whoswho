@@ -15,7 +15,7 @@
 
   <ion-list>
     <!-- Which person you are on in the quiz -->
-    <ion-item>1 of 5</ion-item>
+    <ion-item>{{gameDataSvc.getCurrentPerson()}} of {{gameDataSvc.getNumPersonsInQuiz()}}</ion-item>
     <ion-img class="person-image" src="assets/me_cartoon_befunky.jpg"></ion-img>
 
     <!-- Multiple-choice -->
@@ -40,7 +40,7 @@
       <ion-row class="ion-justify-content-around">
         <ion-button (click)="showHint()">Gimme a Hint</ion-button>
         <ion-button (click)="onSubmit()" [disabled]="!guess">Submit</ion-button>
-        <ion-button [disabled]="!guessIsCorrect">Next</ion-button>
+        <!-- <ion-button [disabled]="!guessIsCorrect" (click)="gameDataSvc.goToNextPerson()">Next</ion-button> -->
       </ion-row>
     </div>
 
