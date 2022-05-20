@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>chooseMode</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-list-header>
+      Choose your game mode:
+    </ion-list-header>
+
+    <ion-radio-group (ionChange)="gameModeSelected($event)">
+      <ion-item *ngFor="let mode of getGameModes()">
+        <ion-label>{{mode}}</ion-label>
+        <ion-radio [value]="mode"></ion-radio>
+      </ion-item>
+    </ion-radio-group>
+
+  </ion-list>
+
+</ion-content>

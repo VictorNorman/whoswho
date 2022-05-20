@@ -11,6 +11,10 @@ const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full'
   },
+  {
+    path: 'choose-mode',
+    loadChildren: () => import('./choose-mode/choose-mode.module').then( m => m.ChooseModePageModule)
+  },
 ];
 
 @NgModule({

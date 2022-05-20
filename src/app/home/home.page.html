@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Blank
+      Who's who?
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -9,12 +9,52 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
+      <ion-title size="large">Who's who?</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+  <ion-list>
+    <!-- Which person you are on in the quiz -->
+    <ion-item>1 of 5</ion-item>
+    <ion-img class="person-image" src="assets/me_cartoon_befunky.jpg"></ion-img>
+
+    <!-- Multiple-choice -->
+    <div *ngIf="gameDataSvc.getGameMode() === 'Multiple choice'">
+      <ion-list>
+        <ion-list-header>Who is this?</ion-list-header>
+        <ion-radio-group>
+          <ion-item *ngFor="let name of names">
+            <ion-label>{{name.name}}</ion-label>
+            <ion-radio [value]="name.name"></ion-radio>
+          </ion-item>
+        </ion-radio-group>
+      </ion-list>
+    </div>
+    <div *ngIf="gameDataSvc.getGameMode() === 'Full name required'">
+      <!-- Fill-in-the-blank -->
+      <ion-item lines="none">
+        <ion-label>Who is this?</ion-label>
+        <ion-input placeholder="Enter this person's name" [(ngModel)]="guess"></ion-input>
+      </ion-item>
+
+      <ion-row class="ion-justify-content-around">
+        <ion-button (click)="showHint()">Gimme a Hint</ion-button>
+        <ion-button (click)="onSubmit()" [disabled]="!guess">Submit</ion-button>
+        <ion-button [disabled]="!guessIsCorrect">Next</ion-button>
+      </ion-row>
+    </div>
+
+  </ion-list>
+
+  <!-- <ion-fab vertical="center" horizontal="start">
+    <ion-fab-button>
+      <ion-icon name="arrow-back-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <ion-fab vertical="center" horizontal="end">
+    <ion-fab-button>
+      <ion-icon name="arrow-forward-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab> -->
+
 </ion-content>
