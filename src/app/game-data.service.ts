@@ -1,4 +1,7 @@
 import { Injectable } from '@angular/core';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
+import { BehaviorSubject } from 'rxjs';
 
 export const GAME_MODES: string[] = [
   'Multiple Choice',
@@ -8,6 +11,7 @@ export const GAME_MODES: string[] = [
 ];
 
 interface FirebasePeopleRecord {
+  id: string;
   belongsTo: string;
   firstName: string;
   lastName: string;
@@ -20,6 +24,9 @@ interface FirebasePeopleRecord {
 })
 export class GameDataService {
 
+  public peopleSubj: BehaviorSubject<FirebasePeopleRecord[]> =
+    new BehaviorSubject<FirebasePeopleRecord[]>(null);
+
   private chosenGameMode: string = null;
   /**
    * The current person being shown for the user to guess.
@@ -27,7 +34,19 @@ export class GameDataService {
   private currentPerson = 1;
   private numPersonsInQuiz = 5;
 
-  constructor() {
+  private people: FirebasePeopleRecord[] = [];
+
+  constructor(
+    private db: AngularFirestore,
+    private afStorage: AngularFireStorage,
+  ) {
+    this.db.collection<FirebasePeopleRecord>('people').valueChanges().subscribe(
+      people => {
+        this.people = people;
+        console.log(JSON.stringify(this.people, null, 2));
+        this.peopleSubj.next(this.people);
+      }
+    );
   }
 
   public getGameModes(): string[] {
