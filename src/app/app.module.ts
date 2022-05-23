@@ -7,11 +7,10 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
-import { Firestore } from '@angular/fire/firestore';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { AngularFireStorageModule } from '@angular/fire/compat/storage';
-import 'firebase/storage';
+import 'firebase/compat/storage';
 import { firebaseConfig } from './credentials';
 
 
@@ -23,6 +22,7 @@ import { firebaseConfig } from './credentials';
     IonicModule.forRoot(),
     AppRoutingModule,
     AngularFireModule.initializeApp(firebaseConfig),
+    AngularFirestoreModule,
     AngularFireStorageModule,
   ],
   providers: [

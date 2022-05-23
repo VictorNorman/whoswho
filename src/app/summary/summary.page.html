@@ -6,4 +6,16 @@
 
 <ion-content>
 
+  <p>
+    You got 3 out of 5 right.
+  </p>
+
+  <p>
+    <ion-router-link (click)="redoQuiz()" routerLink="/quiz">Try again with the same group?</ion-router-link>
+  </p>
+  <p>
+    <ion-router-link (click)="restart()" routerLink="/choose-mode">Start from beginning with a new group</ion-router-link>
+  </p>
+
+
 </ion-content>

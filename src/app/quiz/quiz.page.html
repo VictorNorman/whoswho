@@ -14,35 +14,48 @@
   </ion-header>
 
   <ion-list>
-    <!-- Which person you are on in the quiz -->
-    <ion-item>{{gameDataSvc.getCurrentPerson()}} of {{gameDataSvc.getNumPersonsInQuiz()}}</ion-item>
-    <ion-img class="person-image" src="assets/me_cartoon_befunky.jpg"></ion-img>
+    <ion-progress-bar [value]="gameDataSvc.getCurrentPerson() / gameDataSvc.getNumPersonsInQuiz()"></ion-progress-bar>
+    <!-- <ion-item>{{gameDataSvc.getCurrentPerson()}} of {{gameDataSvc.getNumPersonsInQuiz()}}</ion-item> -->
+    <div *ngIf="imageNotLoaded" class="spinner-area">
+      <ion-spinner class="image-spinner"></ion-spinner>
+    </div>
+    <ion-img class="person-image" [src]="getPerson().imageUrl | async" (ionImgDidLoad)="imageLoaded()"></ion-img>
 
     <!-- Multiple-choice -->
     <div *ngIf="gameDataSvc.getGameMode() === 'Multiple Choice'">
       <ion-list>
         <ion-list-header>Who is this?</ion-list-header>
-        <ion-radio-group>
-          <ion-item *ngFor="let name of names">
-            <ion-label>{{name.name}}</ion-label>
-            <ion-radio [value]="name.name"></ion-radio>
+        <ion-radio-group #radiogroup (ionChange)="choiceSelected($event)">
+          <ion-item *ngFor="let name of mcAnswers">
+            <ion-label>{{name}}</ion-label>
+            <ion-radio [value]="name"></ion-radio>
           </ion-item>
         </ion-radio-group>
       </ion-list>
     </div>
-    <div *ngIf="gameDataSvc.getGameMode() === 'Full name required'">
+    <div *ngIf="gameDataSvc.getGameMode() !== 'Multiple Choice'">
       <!-- Fill-in-the-blank -->
       <ion-item lines="none">
         <ion-label>Who is this?</ion-label>
-        <ion-input placeholder="Enter this person's name" [(ngModel)]="guess"></ion-input>
+        <ion-input [placeholder]="getTextPlaceHolder()" [(ngModel)]="guess"></ion-input>
       </ion-item>
-
-      <ion-row class="ion-justify-content-around">
-        <ion-button (click)="showHint()">Gimme a Hint</ion-button>
-        <ion-button (click)="onSubmit()" [disabled]="!guess">Submit</ion-button>
-        <!-- <ion-button [disabled]="!guessIsCorrect" (click)="gameDataSvc.goToNextPerson()">Next</ion-button> -->
-      </ion-row>
     </div>
+
+    <ion-row class="ion-justify-content-around">
+      <ion-button *ngIf="gameDataSvc.getGameMode() !== 'Multiple Choice'" (click)="showHint()">
+        A hint, please.
+      </ion-button>
+      <ion-button id="submit-button" [disabled]="!guess">
+        That's my answer!
+      </ion-button>
+      <ion-modal trigger="submit-button">
+        <ng-template>
+          <ion-text class="center-text">{{showAnswer()}}</ion-text>
+          <ion-button (click)="dismiss()">Got it!</ion-button>
+        </ng-template>
+      </ion-modal>
+      <!-- <ion-button [disabled]="!guessIsCorrect" (click)="gameDataSvc.goToNextPerson()">Next</ion-button> -->
+    </ion-row>
 
   </ion-list>
 
