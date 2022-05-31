@@ -1,0 +1,31 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Who's who?
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Who's who?</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+
+  <ion-list>
+    <ion-item>
+      <ion-label position="stacked">Enter the name of your organization:</ion-label>
+      <ion-input placeholder="organization" [(ngModel)]="organization"></ion-input>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-label position="stacked">Enter the secret key for your quiz:</ion-label>
+      <ion-input placeholder="secret" [(ngModel)]="secret"></ion-input>
+    </ion-item>
+    <ion-button (click)="onSubmit()">Submit</ion-button>
+    <ion-item lines="none">
+      <span class="tiny">Version 0.1</span>
+    </ion-item>
+  </ion-list>
+</ion-content>

@@ -1,23 +1,32 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Choose your game mode:</ion-title>
+    <ion-title>Game settings</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <ion-list>
+    <ion-item>
+      <ion-item lines="none" style="width: 50%; --padding-start: 0px">
+        How many people should be in the quiz?
+      </ion-item>
+      <ion-range min="5" [max]="gameDataSvc.getMaxPeople()" [pinFormatter]="customFormatter" [pin]="true" color="secondary" [(ngModel)]="numPeople">
+        <ion-label slot="start">5</ion-label>
+        <ion-label slot="end">{{gameDataSvc.getMaxPeople()}}</ion-label>
+      </ion-range>
+    </ion-item>
+    <ion-item lines="none"> <b>Type of quiz</b></ion-item>
     <ion-radio-group (ionChange)="gameModeSelected($event)">
-      <ion-item *ngFor="let mode of getGameModes()">
+      <ion-item *ngFor="let mode of getGameModes()" lines="none">
         <ion-label>{{mode}}</ion-label>
         <ion-radio [value]="mode"></ion-radio>
       </ion-item>
     </ion-radio-group>
-    <ion-item>
-      <ion-button [disabled]="!modeChosen" routerLink="/quiz" routerDirection="forward">
-        Let's play!
-      </ion-button>
-    </ion-item>
-
   </ion-list>
+  <ion-row class="ion-justify-content-around">
+  <ion-button class="center" (click)="saveSettings()" [disabled]="!modeChosen" routerLink="/quiz" routerDirection="forward">
+    Let's play!
+  </ion-button>
+  </ion-row>
 
 </ion-content>

@@ -15,11 +15,12 @@
 
   <ion-list>
     <ion-progress-bar [value]="gameDataSvc.getCurrentPerson() / gameDataSvc.getNumPersonsInQuiz()"></ion-progress-bar>
-    <!-- <ion-item>{{gameDataSvc.getCurrentPerson()}} of {{gameDataSvc.getNumPersonsInQuiz()}}</ion-item> -->
-    <div *ngIf="imageNotLoaded" class="spinner-area">
+
+    <!-- This spinner code didn't work well -- made the screen jump down each time.
+      <div *ngIf="imageNotLoaded" class="spinner-area">
       <ion-spinner class="image-spinner"></ion-spinner>
-    </div>
-    <ion-img class="person-image" [src]="getPerson().imageUrl | async" (ionImgDidLoad)="imageLoaded()"></ion-img>
+    </div> -->
+    <ion-img class="person-image" [src]="getPerson().imageData" (ionImgDidLoad)="imageLoaded()"></ion-img>
 
     <!-- Multiple-choice -->
     <div *ngIf="gameDataSvc.getGameMode() === 'Multiple Choice'">
@@ -48,10 +49,15 @@
       <ion-button id="submit-button" [disabled]="!guess">
         That's my answer!
       </ion-button>
-      <ion-modal trigger="submit-button">
+
+      <ion-modal trigger="submit-button" [ngClass]="isGuessCorrect() ? 'green-modal' : 'red-modal'">
         <ng-template>
-          <ion-text class="center-text">{{showAnswer()}}</ion-text>
-          <ion-button (click)="dismiss()">Got it!</ion-button>
+
+          <ion-text class="center answer-text">
+            <ion-icon [name]="isGuessCorrect() ? 'thumbs-up-sharp' : 'thumbs-down-sharp'"></ion-icon>
+            {{showAnswer()}}
+          </ion-text>
+          <ion-button class="dismiss-button center" (click)="dismiss()">Got it!</ion-button>
         </ng-template>
       </ion-modal>
       <!-- <ion-button [disabled]="!guessIsCorrect" (click)="gameDataSvc.goToNextPerson()">Next</ion-button> -->

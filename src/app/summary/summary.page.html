@@ -1,21 +1,18 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>summary</ion-title>
+    <ion-title>Quiz Summary</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
 
-  <p>
-    You got 3 out of 5 right.
-  </p>
-
-  <p>
-    <ion-router-link (click)="redoQuiz()" routerLink="/quiz">Try again with the same group?</ion-router-link>
-  </p>
-  <p>
-    <ion-router-link (click)="restart()" routerLink="/choose-mode">Start from beginning with a new group</ion-router-link>
-  </p>
-
+  <div style="height: 10vh"></div>
+  <h3 class="center">You got {{dataSvc.getScore()}} out of {{dataSvc.getNumPersonsInQuiz()}} right.</h3>
+  <ion-router-link class="center" (click)="redoQuiz()" routerLink="/quiz">
+    <h4>Try again with the same group?</h4>
+  </ion-router-link>
+  <ion-router-link class="center" (click)="restart()" routerLink="/choose-mode">
+    <h4>Start from beginning with a new group</h4>
+  </ion-router-link>
 
 </ion-content>

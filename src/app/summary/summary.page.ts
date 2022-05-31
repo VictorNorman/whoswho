@@ -8,17 +8,19 @@ import { GameDataService } from '../game-data.service';
 })
 export class SummaryPage implements OnInit {
 
-  constructor(private dataSvc: GameDataService) { }
+  constructor(public dataSvc: GameDataService) { }
 
   ngOnInit() {
   }
 
   public redoQuiz(): void {
     this.dataSvc.resetCurrentPerson();
+    this.dataSvc.resetScore();
   }
 
   public restart(): void {
     this.dataSvc.resetCurrentPerson();
+    this.dataSvc.resetScore();
   }
 
 }

@@ -16,31 +16,39 @@ ion-progress-bar {
   padding-top: 25vw;
 }
 
-.center-text {
+.center {
   display: block;
   margin-left: auto;
   margin-right: auto;
 }
 
-ion-spinner {
-  width: 5em;
-  height: 5em;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+// ion-spinner {
+//   width: 5em;
+//   height: 5em;
+//   display: block;
+//   margin-left: auto;
+//   margin-right: auto;
+//   z-index: 2;
+// }
+
+.green-modal {
+  --background: linear-gradient(to bottom right, lightgreen, green);
+}
+
+.red-modal {
+  --background: linear-gradient(to bottom right, pink, red);
 }
 
 ion-modal {
-  top: 50%;
+  top: 58%;
   height: 100px;
   width: 90%;
   // center it:
   margin-left: auto;
   margin-right: auto;
   border-radius: 5px;
-  --background: lightgreen;
   animation-name: zoomin;
-  animation-duration: 0.5s;
+  animation-duration: 0.3s;
 }
 
 @keyframes zoomin {
@@ -51,4 +59,14 @@ ion-modal {
   100% {
     transform: scale(1);
   }
+}
+
+.dismiss-button {
+  width: 10em;
+  margin-bottom: 8px;
+  --border-radius: 1em;
+}
+
+.answer-text {
+  margin-top: 8px;
 }

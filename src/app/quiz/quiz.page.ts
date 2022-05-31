@@ -15,31 +15,38 @@ export class QuizPage {
   public guess = '';   // the user's guess of who this is.
   public guessIsCorrect = false;
   public mcAnswers: string[] = [];
-  public imageNotLoaded = true;
+  // public imageNotLoaded = true;
 
   constructor(public toastCtrlr: ToastController,
     public gameDataSvc: GameDataService,
     private router: Router,
     private modalCtrl: ModalController) {
-    if (gameDataSvc.getGameMode() === 'Multiple Choice') {
-      this.mcAnswers = gameDataSvc.getMultipleChoiceAnswers();
-    }
+    // if (gameDataSvc.getGameMode() === 'Multiple Choice') {
+    //   this.mcAnswers = gameDataSvc.getMultipleChoiceAnswers();
+    // }
   }
 
   // Clean up previous guess if we navigate back to this page.
   ionViewWillEnter() {
     this.guess = '';
     this.guessIsCorrect = false;
+    this.gameDataSvc.resetScore();
+    if (this.gameDataSvc.getGameMode() === 'Multiple Choice') {
+      this.mcAnswers = this.gameDataSvc.getMultipleChoiceAnswers();
+    }
   }
 
   dismiss() {
     // dismisses the modal which says if the answer is correct or not.
     this.modalCtrl.dismiss();
+    if (this.guessIsCorrect) {
+      this.gameDataSvc.incrScore();
+    }
     if (!this.gameDataSvc.isEndOfQuiz()) {
       this.gameDataSvc.goToNextPerson();
       this.guessIsCorrect = false;
       this.guess = '';
-      this.imageNotLoaded = true;
+      // this.imageNotLoaded = true;
       if (this.gameDataSvc.getGameMode() === 'Multiple Choice') {
         // load up some new random answers;
         this.mcAnswers = this.gameDataSvc.getMultipleChoiceAnswers();
@@ -68,7 +75,7 @@ export class QuizPage {
   }
 
   public imageLoaded() {
-    this.imageNotLoaded = false;
+    // this.imageNotLoaded = false;
   }
 
   public getTextPlaceHolder(): string {
@@ -84,8 +91,11 @@ export class QuizPage {
     }
   }
 
+  public isGuessCorrect(): boolean {
+    return this.gameDataSvc.isGuessCorrect(this.guess);
+  }
   public showAnswer(): string {
-    this.guessIsCorrect = this.gameDataSvc.isGuessCorrect(this.guess);
-    return (this.guessIsCorrect ? 'Correct! ' : 'Sorry, that\'s wrong. ') + `This is ${ this.gameDataSvc.getCorrectAnswer()}.`;
+    this.guessIsCorrect = this.isGuessCorrect();
+    return (this.guessIsCorrect ? 'Correct!\n' : 'Sorry, that\'s wrong.\n') + `This is ${ this.gameDataSvc.getCorrectAnswer()}.`;
   }
 }
