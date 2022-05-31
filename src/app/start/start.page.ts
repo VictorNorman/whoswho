@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { GameDataService } from '../game-data.service';
 import { Storage } from '@ionic/storage-angular';
+import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 
 @Component({
   selector: 'app-start',
@@ -13,16 +14,19 @@ export class StartPage implements OnInit {
 
   public organization: string;
   public secret: string;
+  public notes = 'No note';
 
   constructor(
     private gameDataSvc: GameDataService,
     private router: Router,
     private toastCtrl: ToastController,
     private storage: Storage,
-  )
-  { }
+    private localNots: LocalNotifications)
+  {
+  }
 
   async ngOnInit() {
+    this.localNots.hasPermission().then(res => this.notes = `has permissions = ${res}`);
     await this.storage.create();
     this.organization = (await this.storage.get('organization')) || '';
     this.secret = (await this.storage.get('secret')) || '';

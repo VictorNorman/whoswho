@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
-import { filter, map } from 'rxjs/operators';
+import { SwUpdate } from '@angular/service-worker';
+import { ELocalNotificationTriggerUnit, LocalNotifications } from '@ionic-native/local-notifications/ngx';
+import { Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-root',
@@ -8,18 +9,35 @@ import { filter, map } from 'rxjs/operators';
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  constructor(private swUpdate: SwUpdate) {
-    this.initializeApp();
+  constructor(
+    private swUpdate: SwUpdate,
+    private localNots: LocalNotifications,
+    private platform: Platform)
+  {
+    this.checkForUpdates();
+    platform.ready().then(() => {
+      this.localNots.hasPermission().then(res => confirm(`has permissions = ${res}`));
+      // Initialize local notifications.
+      confirm('initing local notifications');
+      this.localNots.schedule({
+        id: 1,
+        title: 'Don\'t forget to play Who\'s Who?',
+        trigger: {
+          every: ELocalNotificationTriggerUnit.MINUTE,
+          in: 1,
+        }
+      });
+    });
   }
 
-  async initializeApp(): Promise<void> {
+  async checkForUpdates(): Promise<void> {
 
     if (await this.swUpdate.checkForUpdate()) {
       console.log('checkforUpdate returned true!');
       if (confirm('A new version is available. Load it?')) {
         try {
           await this.swUpdate.activateUpdate();
-          confirm('new version activated');
+          confirm('New version activated!');
           window.location.reload();
         } catch {
           console.log('FAILED to ACTIVATE new version!');
@@ -28,19 +46,8 @@ export class AppComponent {
     } else {
       console.log('no new version found');
     }
-    // const updatesAvailable = this.swUpdate.versionUpdates.pipe(
-    //  filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY'),
-    //   map(evt => ({
-    //     type: 'UPDATE_AVAILABLE',
-    //     current: evt.currentVersion,
-    //     available: evt.latestVersion,
-    //   })));
-    // if (this.swUpdate.available) {
-    //   this.swUpdate.available.subscribe(() => {
-    //     if (confirm('A new version is available. Load it?')) {
-    //       window.location.reload();
-    //     }
-    //   });
-    // }
+
+
   }
+
 }
