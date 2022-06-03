@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
-import { ELocalNotificationTriggerUnit, LocalNotifications } from '@ionic-native/local-notifications/ngx';
 import { Platform } from '@ionic/angular';
 
 @Component({
@@ -11,22 +10,10 @@ import { Platform } from '@ionic/angular';
 export class AppComponent {
   constructor(
     private swUpdate: SwUpdate,
-    private localNots: LocalNotifications,
     private platform: Platform)
   {
     this.checkForUpdates();
-    platform.ready().then(() => {
-      this.localNots.hasPermission().then(res => confirm(`has permissions = ${res}`));
-      // Initialize local notifications.
-      confirm('initing local notifications');
-      this.localNots.schedule({
-        id: 1,
-        title: 'Don\'t forget to play Who\'s Who?',
-        trigger: {
-          every: ELocalNotificationTriggerUnit.MINUTE,
-          in: 1,
-        }
-      });
+    platform.ready().then(async () => {
     });
   }
 

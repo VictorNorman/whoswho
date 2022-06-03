@@ -14,7 +14,6 @@ import { firebaseConfig } from './credentials';
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
-import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -38,7 +37,6 @@ import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
       provide: RouteReuseStrategy,
       useClass: IonicRouteStrategy,
     },
-    LocalNotifications,
   ],
   bootstrap: [AppComponent],
 })

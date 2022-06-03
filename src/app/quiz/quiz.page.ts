@@ -15,15 +15,11 @@ export class QuizPage {
   public guess = '';   // the user's guess of who this is.
   public guessIsCorrect = false;
   public mcAnswers: string[] = [];
-  // public imageNotLoaded = true;
 
   constructor(public toastCtrlr: ToastController,
     public gameDataSvc: GameDataService,
     private router: Router,
     private modalCtrl: ModalController) {
-    // if (gameDataSvc.getGameMode() === 'Multiple Choice') {
-    //   this.mcAnswers = gameDataSvc.getMultipleChoiceAnswers();
-    // }
   }
 
   // Clean up previous guess if we navigate back to this page.
@@ -36,9 +32,9 @@ export class QuizPage {
     }
   }
 
-  dismiss() {
+  async dismiss() {
     // dismisses the modal which says if the answer is correct or not.
-    this.modalCtrl.dismiss();
+    await this.modalCtrl.dismiss();
     if (this.guessIsCorrect) {
       this.gameDataSvc.incrScore();
     }
@@ -46,7 +42,6 @@ export class QuizPage {
       this.gameDataSvc.goToNextPerson();
       this.guessIsCorrect = false;
       this.guess = '';
-      // this.imageNotLoaded = true;
       if (this.gameDataSvc.getGameMode() === 'Multiple Choice') {
         // load up some new random answers;
         this.mcAnswers = this.gameDataSvc.getMultipleChoiceAnswers();
@@ -75,7 +70,6 @@ export class QuizPage {
   }
 
   public imageLoaded() {
-    // this.imageNotLoaded = false;
   }
 
   public getTextPlaceHolder(): string {

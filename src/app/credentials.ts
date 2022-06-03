@@ -4,6 +4,6 @@ export const firebaseConfig = {
     projectId: 'vtn2-whoswho',
     storageBucket: 'vtn2-whoswho.appspot.com',
     messagingSenderId: '909733348055',
-    appId: '1:909733348055:web:f9e0898970e7b3927fa692',
-    measurementId: 'G-RYJ0HK5VSM'
+    appId: '1:909733348055:web:bfc2b3eb8de22b647fa692',
+    measurementId: 'G-S41MY9LVY7'
 };

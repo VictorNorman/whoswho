@@ -20,7 +20,7 @@
       <div *ngIf="imageNotLoaded" class="spinner-area">
       <ion-spinner class="image-spinner"></ion-spinner>
     </div> -->
-    <ion-img class="person-image" [src]="getPerson().imageData" (ionImgDidLoad)="imageLoaded()"></ion-img>
+    <ion-img class="person-image" [src]="getPerson().imageData"></ion-img>
 
     <!-- Multiple-choice -->
     <div *ngIf="gameDataSvc.getGameMode() === 'Multiple Choice'">

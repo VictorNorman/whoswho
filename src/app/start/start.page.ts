@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { GameDataService } from '../game-data.service';
 import { Storage } from '@ionic/storage-angular';
-import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 
 @Component({
   selector: 'app-start',
@@ -14,19 +13,16 @@ export class StartPage implements OnInit {
 
   public organization: string;
   public secret: string;
-  public notes = 'No note';
 
   constructor(
     private gameDataSvc: GameDataService,
     private router: Router,
     private toastCtrl: ToastController,
     private storage: Storage,
-    private localNots: LocalNotifications)
-  {
-  }
+  )
+  {  }
 
   async ngOnInit() {
-    this.localNots.hasPermission().then(res => this.notes = `has permissions = ${res}`);
     await this.storage.create();
     this.organization = (await this.storage.get('organization')) || '';
     this.secret = (await this.storage.get('secret')) || '';
@@ -48,7 +44,6 @@ export class StartPage implements OnInit {
   }
 
   public onSubmit(): void {
-    console.log('got my info');
     // this will start the data service looking for the given org/secret.
     // when it completes its query, the subscription to the orgLoadSubj will fire, see above.
     this.gameDataSvc.checkOrgAndSecretAgainstDb(this.organization, this.secret);
