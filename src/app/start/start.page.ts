@@ -44,6 +44,8 @@ export class StartPage implements OnInit {
   }
 
   public onSubmit(): void {
+    this.organization = this.organization.trim();
+    this.secret = this.secret.trim();
     // this will start the data service looking for the given org/secret.
     // when it completes its query, the subscription to the orgLoadSubj will fire, see above.
     this.gameDataSvc.checkOrgAndSecretAgainstDb(this.organization, this.secret);

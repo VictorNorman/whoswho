@@ -5,12 +5,19 @@
 </ion-header>
 
 <ion-content>
+  <ion-row class="ion-justify-content-around">
+    <ion-button class="center" (click)="dailyQuiz()">Choose the daily quiz</ion-button>
+  </ion-row>
+  <ion-row class="ion-justify-content-around">
+  <h4 class="center">or choose options below:</h4>
+  </ion-row>
   <ion-list>
     <ion-item>
       <ion-item lines="none" style="width: 50%; --padding-start: 0px">
         How many people should be in the quiz?
       </ion-item>
-      <ion-range min="5" [max]="gameDataSvc.getMaxPeople()" [pinFormatter]="customFormatter" [pin]="true" color="secondary" [(ngModel)]="numPeople">
+      <ion-range min="5" [max]="gameDataSvc.getMaxPeople()" [pinFormatter]="customFormatter" [pin]="true"
+        color="secondary" [(ngModel)]="numPeople">
         <ion-label slot="start">5</ion-label>
         <ion-label slot="end">{{gameDataSvc.getMaxPeople()}}</ion-label>
       </ion-range>
@@ -24,9 +31,10 @@
     </ion-radio-group>
   </ion-list>
   <ion-row class="ion-justify-content-around">
-  <ion-button class="center" (click)="saveSettings()" [disabled]="!modeChosen" routerLink="/quiz" routerDirection="forward">
-    Let's play!
-  </ion-button>
+    <ion-button class="center" (click)="saveSettings()" [disabled]="!modeChosen" routerLink="/quiz"
+      routerDirection="forward">
+      Let's play!
+    </ion-button>
   </ion-row>
 
 </ion-content>

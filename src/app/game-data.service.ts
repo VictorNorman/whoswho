@@ -7,6 +7,7 @@ export const GAME_MODES: string[] = [
   'Last name only',
   'First name only',
   'Full name required',
+  'Daily quiz',   // uses multiple choice
 ];
 
 interface FirestorePeopleRecord {
@@ -48,20 +49,16 @@ export class GameDataService {
   ) {
   }
 
-  public checkOrgAndSecretAgainstDb(org: string, secret: string): void {
+  public async checkOrgAndSecretAgainstDb(org: string, secret: string): Promise<void> {
     this.org = null;
-    this.db.collection<FirebaseOrgRecord>('organization',
-      ref => ref.where('organization', '==', org)).valueChanges().subscribe(
-        orgs => {
-          if (orgs.length === 0 || orgs[0].secret !== secret) {
-            this.orgLoadedSubj.next('bad org or secret');
-          } else {
-            this.org = org;
-            this.getPeopleFromDb();
-            this.orgLoadedSubj.next('org loaded');
-          }
-        }
-      );
+    const doc = await this.db.collection<FirebaseOrgRecord>('organization').doc(org).get().toPromise();
+    if (!doc.data() || doc.data().secret !== secret) {
+      this.orgLoadedSubj.next('bad org or secret');
+    } else {
+      this.org = org;
+      this.getPeopleFromDb();
+      this.orgLoadedSubj.next('org loaded');
+    }
   }
 
   public getPeopleFromDb() {
@@ -93,7 +90,6 @@ export class GameDataService {
 
   public incrScore() {
     this.score++;
-    console.log('incrScore to ', this.score);
   }
   public getScore() {
     return this.score;
@@ -143,6 +139,7 @@ export class GameDataService {
     switch (this.chosenGameMode) {
       case 'Full name required':
       case 'Multiple Choice':
+      case 'Daily Quiz':
         return guess.toUpperCase() === `${this.getPerson().firstName.toUpperCase()} ${this.getPerson().lastName.toUpperCase()}` ||
           guess.toUpperCase() === `${this.getPerson().nickName.toUpperCase()} ${this.getPerson().lastName.toUpperCase()}`;
       case 'Last name only':

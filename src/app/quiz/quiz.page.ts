@@ -88,6 +88,7 @@ export class QuizPage {
   public isGuessCorrect(): boolean {
     return this.gameDataSvc.isGuessCorrect(this.guess);
   }
+
   public showAnswer(): string {
     this.guessIsCorrect = this.isGuessCorrect();
     return (this.guessIsCorrect ? 'Correct!\n' : 'Sorry, that\'s wrong.\n') + `This is ${ this.gameDataSvc.getCorrectAnswer()}.`;

@@ -15,6 +15,10 @@ export class ChooseModePage implements OnInit {
   ngOnInit() {
   }
 
+  public dailyQuiz() {
+    this.gameDataSvc.setGameMode('Daily quiz');
+  }
+
   public getGameModes(): string[] {
     return this.gameDataSvc.getGameModes();
   }
