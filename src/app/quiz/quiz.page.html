@@ -23,7 +23,7 @@
     <ion-img class="person-image" [src]="getPerson().imageData"></ion-img>
 
     <!-- Multiple-choice -->
-    <div *ngIf="gameDataSvc.getGameMode() === 'Multiple Choice'">
+    <div *ngIf="useMCQuestions()">
       <ion-list>
         <ion-list-header>Who is this?</ion-list-header>
         <ion-radio-group #radiogroup (ionChange)="choiceSelected($event)">
@@ -34,7 +34,7 @@
         </ion-radio-group>
       </ion-list>
     </div>
-    <div *ngIf="gameDataSvc.getGameMode() !== 'Multiple Choice'">
+    <div *ngIf="!useMCQuestions()">
       <!-- Fill-in-the-blank -->
       <ion-item lines="none">
         <ion-label>Who is this?</ion-label>
@@ -43,7 +43,7 @@
     </div>
 
     <ion-row class="ion-justify-content-around">
-      <ion-button *ngIf="gameDataSvc.getGameMode() !== 'Multiple Choice'" (click)="showHint()">
+      <ion-button *ngIf="! useMCQuestions()" (click)="showHint()">
         A hint, please.
       </ion-button>
       <ion-button id="submit-button" [disabled]="!guess">
@@ -60,7 +60,6 @@
           <ion-button class="dismiss-button center" (click)="dismiss()">Got it!</ion-button>
         </ng-template>
       </ion-modal>
-      <!-- <ion-button [disabled]="!guessIsCorrect" (click)="gameDataSvc.goToNextPerson()">Next</ion-button> -->
     </ion-row>
 
   </ion-list>

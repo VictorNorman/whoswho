@@ -24,6 +24,10 @@ interface FirebaseOrgRecord {
   secret: string;
 }
 
+interface FirebaseDailyQuizPeople {
+  people: Array<{ doc: string }>;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -66,11 +70,13 @@ export class GameDataService {
     this.people = [];
     this.quizPeople = [];
     this.db.collection<FirestorePeopleRecord>('people',
-      ref => ref.where('belongsTo', '==', this.org)).valueChanges().subscribe(
+      ref => ref.where('belongsTo', '==', this.org)).valueChanges({ idField: 'id' }).subscribe(
         people => {
           if (people) {
             this.people = people;
             console.log('got people: ', people);
+            console.log('calling getDaily');
+            this.getDailyQuizFromDb();
           }
         }
       );
@@ -81,6 +87,7 @@ export class GameDataService {
   }
 
   public setGameMode(mode: string): void {
+    console.log('game mode set to ', mode);
     this.chosenGameMode = mode;
   }
 
@@ -124,11 +131,17 @@ export class GameDataService {
     return this.people.length;
   }
 
-  // set the number of people to be in the quiz, and get those random people from
-  // the whole list.
   public setNumPersonsInQuiz(np: number): void {
     this.numPersonsInQuiz = np;
-    this.pickNRandomPeople();
+  }
+
+  public pickPeopleForQuiz(): void {
+    if (this.chosenGameMode === 'Multiple Choice') {
+      this.quizPeople = this.pickNRandomPeople();
+    } else if (this.chosenGameMode === 'Daily quiz') {
+      console.log('pickPopelForQuiz: calling getDFDB');
+      this.getDailyQuizFromDb();
+    }
   }
 
   public getPerson(): FirestorePeopleRecord {
@@ -139,7 +152,7 @@ export class GameDataService {
     switch (this.chosenGameMode) {
       case 'Full name required':
       case 'Multiple Choice':
-      case 'Daily Quiz':
+      case 'Daily quiz':
         return guess.toUpperCase() === `${this.getPerson().firstName.toUpperCase()} ${this.getPerson().lastName.toUpperCase()}` ||
           guess.toUpperCase() === `${this.getPerson().nickName.toUpperCase()} ${this.getPerson().lastName.toUpperCase()}`;
       case 'Last name only':
@@ -167,6 +180,7 @@ export class GameDataService {
     }
   }
 
+  // build up random wrong answers for the multiple choice format
   public getMultipleChoiceAnswers(): string[] {
     const results = [this.makeFullName(this.getPerson())];
     // 4 multiple choice answers
@@ -180,6 +194,23 @@ export class GameDataService {
     return this.shuffle(results);
   }
 
+  /**
+   * set quizPeople to the list of people from the latest dailies entry in the database.
+   */
+  private getDailyQuizFromDb(): void {
+    this.db.collection<FirebaseDailyQuizPeople>(`organization/${this.org}/dailies`,
+      ref => ref.orderBy('timestamp', 'desc')).valueChanges().subscribe(
+        res => {
+          // We have all the people already, so we can use the ids to just
+          // reference the entries in people...  TODO: probably want to not
+          // pull all people each time.
+          this.quizPeople = res[0].people.map(personId =>
+            this.people.find((p) => p.id === personId.doc));
+          console.log('quiz people = retrieved');
+        });
+  }
+
+
 
   private getRandomPerson(people: FirestorePeopleRecord[]) {
     return people[Math.floor(Math.random() * people.length)];
@@ -189,10 +220,10 @@ export class GameDataService {
     return `${person.firstName} ${person.lastName}`;
   }
 
-  private pickNRandomPeople(): void {
+  private pickNRandomPeople(): FirestorePeopleRecord[] {
     // create a quiz from N random people in the people array.
     const shuffled = this.shuffle(this.people);
-    this.quizPeople = shuffled.slice(0, this.numPersonsInQuiz);
+    return shuffled.slice(0, this.numPersonsInQuiz);
     // console.log('pick random peopl = ', JSON.stringify(this.quizPeople, null, 2));
   }
 
@@ -201,4 +232,6 @@ export class GameDataService {
     return arr.map(x => [Math.random(), x]).sort(([a], [b]) =>
       (a as number) - (b as number)).map(([_, x]) => x) as T[];
   }
+
+
 }

@@ -6,7 +6,10 @@
 
 <ion-content>
   <ion-row class="ion-justify-content-around">
-    <ion-button class="center" (click)="dailyQuiz()">Choose the daily quiz</ion-button>
+    <ion-button class="center" (click)="dailyQuiz()" routerLink="/quiz"
+      routerDirection="forward">
+      Choose the daily quiz
+    </ion-button>
   </ion-row>
   <ion-row class="ion-justify-content-around">
   <h4 class="center">or choose options below:</h4>

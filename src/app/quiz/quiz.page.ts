@@ -27,8 +27,9 @@ export class QuizPage {
     this.guess = '';
     this.guessIsCorrect = false;
     this.gameDataSvc.resetScore();
-    if (this.gameDataSvc.getGameMode() === 'Multiple Choice') {
+    if (this.useMCQuestions()) {
       this.mcAnswers = this.gameDataSvc.getMultipleChoiceAnswers();
+      console.log('mcAnswers set to ', this.mcAnswers);
     }
   }
 
@@ -42,7 +43,7 @@ export class QuizPage {
       this.gameDataSvc.goToNextPerson();
       this.guessIsCorrect = false;
       this.guess = '';
-      if (this.gameDataSvc.getGameMode() === 'Multiple Choice') {
+      if (this.useMCQuestions()) {
         // load up some new random answers;
         this.mcAnswers = this.gameDataSvc.getMultipleChoiceAnswers();
         // Clear the choice in the radio group.
@@ -67,9 +68,14 @@ export class QuizPage {
 
   public choiceSelected(event) {
     this.guess = event.detail.value;
+    console.log('choiceSelected: guess = ', this.guess);
   }
 
   public imageLoaded() {
+  }
+
+  public useMCQuestions(): boolean {
+    return this.gameDataSvc.getGameMode() === 'Multiple Choice' || this.gameDataSvc.getGameMode() === 'Daily quiz';
   }
 
   public getTextPlaceHolder(): string {

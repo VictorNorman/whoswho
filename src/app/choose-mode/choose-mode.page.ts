@@ -17,6 +17,7 @@ export class ChooseModePage implements OnInit {
 
   public dailyQuiz() {
     this.gameDataSvc.setGameMode('Daily quiz');
+    this.gameDataSvc.pickPeopleForQuiz();
   }
 
   public getGameModes(): string[] {
@@ -31,6 +32,7 @@ export class ChooseModePage implements OnInit {
   // the game mode is already saved in the function above.
   public saveSettings(): void {
     this.gameDataSvc.setNumPersonsInQuiz(this.numPeople);
+    this.gameDataSvc.pickPeopleForQuiz();
   }
 
   public customFormatter(value: number): string {
