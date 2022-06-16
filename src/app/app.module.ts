@@ -15,6 +15,8 @@ import { IonicStorageModule } from '@ionic/storage-angular';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 
+// import './firebase-initialization';
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],

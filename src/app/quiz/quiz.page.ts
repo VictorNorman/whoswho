@@ -12,6 +12,7 @@ export class QuizPage {
 
   @ViewChild('radiogroup', { static: false }) radioGroup: IonRadioGroup;
 
+  public title = 'Image Bearers';
   public guess = '';   // the user's guess of who this is.
   public guessIsCorrect = false;
   public mcAnswers: string[] = [];

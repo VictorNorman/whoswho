@@ -11,6 +11,7 @@ import { Storage } from '@ionic/storage-angular';
 })
 export class StartPage implements OnInit {
 
+  public title = 'Image Bearers';
   public organization: string;
   public secret: string;
 

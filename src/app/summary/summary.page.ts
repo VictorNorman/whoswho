@@ -23,4 +23,7 @@ export class SummaryPage implements OnInit {
     this.dataSvc.resetScore();
   }
 
+  // '🟨';
+  // '🟩';
+  // '⬛'
 }
