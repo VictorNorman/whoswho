@@ -7,7 +7,7 @@ export const GAME_MODES: string[] = [
   'Last name only',
   'First name only',
   'Full name required',
-  'Daily quiz',   // uses multiple choice
+  // 'Daily quiz',   // uses multiple choice
 ];
 
 interface FirestorePeopleRecord {
