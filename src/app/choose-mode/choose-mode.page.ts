@@ -17,7 +17,7 @@ export class ChooseModePage implements OnInit {
 
   public dailyQuiz() {
     this.gameDataSvc.setGameMode('Daily quiz');
-    this.gameDataSvc.pickPeopleForQuiz();
+    // this.gameDataSvc.pickPeopleForQuiz();
   }
 
   public getGameModes(): string[] {

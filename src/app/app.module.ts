@@ -14,6 +14,7 @@ import { firebaseConfig } from './credentials';
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { AngularFireFunctionsModule } from '@angular/fire/compat/functions';
 
 // import './firebase-initialization';
 
@@ -26,6 +27,8 @@ import { environment } from '../environments/environment';
     AppRoutingModule,
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFirestoreModule,
+    AngularFirestoreModule.enablePersistence(),   // not sure if line above is needed.
+    AngularFireFunctionsModule,
     IonicStorageModule.forRoot(),
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,

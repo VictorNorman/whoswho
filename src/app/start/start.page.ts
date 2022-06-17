@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { GameDataService } from '../game-data.service';
 import { Storage } from '@ionic/storage-angular';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
 
 @Component({
   selector: 'app-start',
@@ -15,15 +16,24 @@ export class StartPage implements OnInit {
   public organization: string;
   public secret: string;
 
+  cloudMessage = '';
+
   constructor(
     private gameDataSvc: GameDataService,
     private router: Router,
     private toastCtrl: ToastController,
     private storage: Storage,
+    private fns: AngularFireFunctions,
   )
-  {  }
+  {
+  }
 
   async ngOnInit() {
+    // const callable = this.fns.httpsCallable('callMe');
+    // this.cloudMessage = await callable({
+    //   name: 'some-data',
+    // }).toPromise();
+
     await this.storage.create();
     this.organization = (await this.storage.get('organization')) || '';
     this.secret = (await this.storage.get('secret')) || '';

@@ -136,15 +136,11 @@ export class GameDataService {
   }
 
   public pickPeopleForQuiz(): void {
-    if (this.chosenGameMode === 'Multiple Choice') {
       this.quizPeople = this.pickNRandomPeople();
-    } else if (this.chosenGameMode === 'Daily quiz') {
-      console.log('pickPopelForQuiz: calling getDFDB');
-      this.getDailyQuizFromDb();
-    }
   }
 
   public getPerson(): FirestorePeopleRecord {
+    console.log('getPerson: index is', this.getCurrentPerson() - 1);
     return this.quizPeople[this.getCurrentPerson() - 1];
   }
 
@@ -206,7 +202,7 @@ export class GameDataService {
           // pull all people each time.
           this.quizPeople = res[0].people.map(personId =>
             this.people.find((p) => p.id === personId.doc));
-          console.log('quiz people = retrieved');
+          console.log('quiz people retrieved: ', this.quizPeople);
         });
   }
 
