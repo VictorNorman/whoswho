@@ -34,8 +34,8 @@
         </ion-radio-group>
       </ion-list>
     </div>
+    <!-- Fill-in-the-blank -->
     <div *ngIf="!useMCQuestions()">
-      <!-- Fill-in-the-blank -->
       <ion-item lines="none">
         <ion-label>Who is this?</ion-label>
         <ion-input [placeholder]="getTextPlaceHolder()" [(ngModel)]="guess"></ion-input>
@@ -63,16 +63,5 @@
     </ion-row>
 
   </ion-list>
-
-  <!-- <ion-fab vertical="center" horizontal="start">
-    <ion-fab-button>
-      <ion-icon name="arrow-back-outline"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
-  <ion-fab vertical="center" horizontal="end">
-    <ion-fab-button>
-      <ion-icon name="arrow-forward-outline"></ion-icon>
-    </ion-fab-button>
-  </ion-fab> -->
 
 </ion-content>

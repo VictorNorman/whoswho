@@ -5,25 +5,27 @@
 </ion-header>
 
 <ion-content>
-  <ion-row class="ion-justify-content-around">
+  <ion-row class="ion-justify-content-around choose-daily-quiz-area">
     <ion-button class="center" (click)="dailyQuiz()" routerLink="/quiz"
       routerDirection="forward">
       Choose the daily quiz
     </ion-button>
   </ion-row>
+  <ion-item></ion-item>
   <ion-row class="ion-justify-content-around">
   <h4 class="center">or choose options below:</h4>
   </ion-row>
   <ion-list>
     <ion-item>
-      <ion-item lines="none" style="width: 50%; --padding-start: 0px">
+      <ion-item lines="none" style="width: 80%; --padding-start: 0px">
         How many people should be in the quiz?
       </ion-item>
-      <ion-range min="5" [max]="gameDataSvc.getMaxPeople()" [pinFormatter]="customFormatter" [pin]="true"
-        color="secondary" [(ngModel)]="numPeople">
-        <ion-label slot="start">5</ion-label>
-        <ion-label slot="end">{{gameDataSvc.getMaxPeople()}}</ion-label>
-      </ion-range>
+      <!-- <ion-range min="5" [max]="gameDataSvc.getMaxPeople()" [pinFormatter]="customFormatter" [pin]="true"
+        color="secondary" [(ngModel)]="numPeople"> -->
+        <!-- <ion-label slot="start">5</ion-label> -->
+        <!-- <ion-label slot="end">{{gameDataSvc.getMaxPeople()}}</ion-label> -->
+        <!-- </ion-range> -->
+      <ion-input type="number" min="5" [max]="gameDataSvc.getMaxPeople()" step=5 [(ngModel)]="numPeople"></ion-input>
     </ion-item>
     <ion-item lines="none"> <b>Type of quiz</b></ion-item>
     <ion-radio-group (ionChange)="gameModeSelected($event)">

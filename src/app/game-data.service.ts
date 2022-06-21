@@ -40,7 +40,7 @@ export class GameDataService {
    * The current person being shown for the user to guess.
    */
   private currentPerson = 1;
-  private numPersonsInQuiz = 5;  // default
+  private numPersonsInQuiz: number;
 
   private people: FirestorePeopleRecord[] = [];
   private quizPeople: FirestorePeopleRecord[] = [];
@@ -203,6 +203,7 @@ export class GameDataService {
           this.quizPeople = res[0].people.map(personId =>
             this.people.find((p) => p.id === personId.doc));
           console.log('quiz people retrieved: ', this.quizPeople);
+          this.numPersonsInQuiz = this.quizPeople.length;
         });
   }
 

@@ -8,7 +8,7 @@ import { GameDataService } from '../game-data.service';
 })
 export class ChooseModePage implements OnInit {
   public modeChosen = false;
-  public numPeople = 5;
+  public numPeople = 10;
 
   constructor(public gameDataSvc: GameDataService) { }
 
