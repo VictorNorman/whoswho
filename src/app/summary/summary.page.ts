@@ -23,6 +23,10 @@ export class SummaryPage implements OnInit {
     this.dataSvc.resetScore();
   }
 
+  public genNstars(n: number) {
+    return '⭐'.repeat(n);
+  }
+
   // '🟨';
   // '🟩';
   // '⬛'

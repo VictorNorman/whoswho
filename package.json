@@ -9,7 +9,8 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "postinstall": "ngcc"
   },
   "private": true,
   "dependencies": {
@@ -32,6 +33,7 @@
     "@ionic/storage-angular": "^3.0.6",
     "firebase": "^9.8.1",
     "firebase-functions": "^3.21.2",
+    "ngx-material-rating": "^2.0.0",
     "rxjs": "~6.6.0",
     "tslib": "^2.2.0",
     "zone.js": "~0.11.4"

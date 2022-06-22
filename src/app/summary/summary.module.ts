@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
-
+import { NgxMaterialRatingModule } from 'ngx-material-rating';
 import { SummaryPageRoutingModule } from './summary-routing.module';
 
 import { SummaryPage } from './summary.page';
@@ -13,6 +13,7 @@ import { SummaryPage } from './summary.page';
     CommonModule,
     FormsModule,
     IonicModule,
+    NgxMaterialRatingModule,
     SummaryPageRoutingModule
   ],
   declarations: [SummaryPage]
