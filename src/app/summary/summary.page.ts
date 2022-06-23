@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GameDataService } from '../game-data.service';
+import { Share } from '@capacitor/share';
 
 @Component({
   selector: 'app-summary',
@@ -25,6 +26,21 @@ export class SummaryPage implements OnInit {
 
   public genNstars(n: number) {
     return '⭐'.repeat(n);
+  }
+
+  public async shareResults() {
+    // https://stackoverflow.com/questions/1531093/how-do-i-get-the-current-date-in-javascript
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    const yyyy = today.getFullYear();
+    const todayStr = `${mm}/${dd}/${yyyy}`;
+
+    await Share.share({
+      title: 'Share your score',
+      text: `Image Bearers on ${todayStr}: ${this.genNstars(this.dataSvc.getScore())}`,
+      dialogTitle: 'Share your score',
+    });
   }
 
   // '🟨';

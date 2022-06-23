@@ -8,8 +8,11 @@
 
   <div style="height: 10vh"></div>
   <h3 class="center">You got {{dataSvc.getScore()}} out of {{dataSvc.getNumPersonsInQuiz()}} right.</h3>
-  <ion-item class="center-text">
+  <ion-item lines="none" class="center-text">
     {{genNstars(dataSvc.getScore())}}
+  </ion-item>
+  <ion-item lines="none" class="center-text">
+    <ion-button (click)="shareResults()">Share</ion-button>
   </ion-item>
   <ion-router-link class="center" (click)="redoQuiz()" routerLink="/quiz">
     <h4>Try again with the same group?</h4>

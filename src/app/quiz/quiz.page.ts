@@ -37,7 +37,7 @@ export class QuizPage {
   async dismiss() {
     // dismisses the modal which says if the answer is correct or not.
     await this.modalCtrl.dismiss();
-    if (this.guessIsCorrect) {
+    if (this.isGuessCorrect()) {
       this.gameDataSvc.incrScore();
     }
     if (!this.gameDataSvc.isEndOfQuiz()) {
@@ -96,8 +96,4 @@ export class QuizPage {
     return this.gameDataSvc.isGuessCorrect(this.guess);
   }
 
-  public showAnswer(): string {
-    this.guessIsCorrect = this.isGuessCorrect();
-    return (this.guessIsCorrect ? 'Correct!\n' : 'Sorry, that\'s wrong.\n') + `This is ${ this.gameDataSvc.getCorrectAnswer()}.`;
-  }
 }

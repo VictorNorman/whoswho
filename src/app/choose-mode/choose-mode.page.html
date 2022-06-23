@@ -5,7 +5,8 @@
 </ion-header>
 
 <ion-content>
-  <ion-row class="ion-justify-content-around choose-daily-quiz-area">
+  <ion-row class="ion-justify-content-around
+  ">
     <ion-button class="center" (click)="dailyQuiz()" routerLink="/quiz"
       routerDirection="forward">
       Choose the daily quiz
@@ -17,7 +18,7 @@
   </ion-row>
   <ion-list>
     <ion-item>
-      <ion-item lines="none" style="width: 80%; --padding-start: 0px">
+      <ion-item lines="none" style="width: 70%; --padding-start: 0px">
         How many people should be in the quiz?
       </ion-item>
       <!-- <ion-range min="5" [max]="gameDataSvc.getMaxPeople()" [pinFormatter]="customFormatter" [pin]="true"

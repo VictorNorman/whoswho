@@ -21,6 +21,11 @@ ion-progress-bar {
   margin-left: auto;
   margin-right: auto;
 }
+.center-text {
+  display: table;
+  margin-left: auto;
+  margin-right: auto;
+}
 
 // ion-spinner {
 //   width: 5em;
@@ -46,7 +51,7 @@ ion-modal {
   // center it:
   margin-left: auto;
   margin-right: auto;
-  border-radius: 5px;
+  border-radius: 20px;
   animation-name: zoomin;
   animation-duration: 0.3s;
 }
@@ -69,4 +74,12 @@ ion-modal {
 
 .answer-text {
   margin-top: 8px;
+}
+
+.space-after {
+  padding-right: 10px;
+}
+
+.correct-answer {
+  font-weight: bold;
 }

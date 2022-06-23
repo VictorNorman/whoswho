@@ -25,7 +25,7 @@
     <!-- Multiple-choice -->
     <div *ngIf="useMCQuestions()">
       <ion-list>
-        <ion-list-header>Who is this?</ion-list-header>
+        <ion-list-header>Who is this image bearer?</ion-list-header>
         <ion-radio-group #radiogroup (ionChange)="choiceSelected($event)">
           <ion-item *ngFor="let name of mcAnswers">
             <ion-label>{{name}}</ion-label>
@@ -53,9 +53,12 @@
       <ion-modal trigger="submit-button" [ngClass]="isGuessCorrect() ? 'green-modal' : 'red-modal'">
         <ng-template>
 
-          <ion-text class="center answer-text">
-            <ion-icon [name]="isGuessCorrect() ? 'thumbs-up-sharp' : 'thumbs-down-sharp'"></ion-icon>
-            {{showAnswer()}}
+          <ion-text class="center-text answer-text">
+            <ion-icon class="space-after" [name]="isGuessCorrect() ? 'thumbs-up-sharp' : 'thumbs-down-sharp'"></ion-icon>
+            <span>{{isGuessCorrect() ? "Correct!  " : "Sorry, that's wrong.  "}} This is </span>
+            <div class="correct-answer center-text">
+              {{gameDataSvc.getCorrectAnswer()}}
+            </div>
           </ion-text>
           <ion-button class="dismiss-button center" (click)="dismiss()">Got it!</ion-button>
         </ng-template>
