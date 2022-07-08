@@ -7,34 +7,36 @@
 <ion-content>
   <ion-row class="ion-justify-content-around
   ">
-    <ion-button class="center" (click)="dailyQuiz()" routerLink="/quiz"
-      routerDirection="forward">
+    <ion-button class="center" (click)="dailyQuiz()">
       Choose the daily quiz
     </ion-button>
   </ion-row>
   <ion-item></ion-item>
   <ion-row class="ion-justify-content-around">
-  <h4 class="center">or choose options below:</h4>
+    <h4 class="center">or choose options below:</h4>
   </ion-row>
   <ion-list>
-    <ion-item>
-      <ion-item lines="none" style="width: 70%; --padding-start: 0px">
-        How many people should be in the quiz?
+    <!-- <ion-item> -->
+    <ion-item lines="none" class="how-many-people">
+      How many people should be in the quiz?
       </ion-item>
-      <!-- <ion-range min="5" [max]="gameDataSvc.getMaxPeople()" [pinFormatter]="customFormatter" [pin]="true"
-        color="secondary" [(ngModel)]="numPeople"> -->
-        <!-- <ion-label slot="start">5</ion-label> -->
-        <!-- <ion-label slot="end">{{gameDataSvc.getMaxPeople()}}</ion-label> -->
-        <!-- </ion-range> -->
-      <ion-input type="number" min="5" [max]="gameDataSvc.getMaxPeople()" step=5 [(ngModel)]="numPeople"></ion-input>
-    </ion-item>
-    <ion-item lines="none"> <b>Type of quiz</b></ion-item>
-    <ion-radio-group (ionChange)="gameModeSelected($event)">
-      <ion-item *ngFor="let mode of getGameModes()" lines="none">
-        <ion-label>{{mode}}</ion-label>
-        <ion-radio [value]="mode"></ion-radio>
+      <ion-item>
+        <ion-range min=5 step=5 [max]="gameDataSvc.getMaxPeople()" [pinFormatter]="customFormatter" [pin]="true"
+          color="secondary" [(ngModel)]="numPeople">
+          <ion-label slot="start">5</ion-label>
+          <ion-label slot="end">{{gameDataSvc.getMaxPeople()}}</ion-label>
+        </ion-range>
       </ion-item>
-    </ion-radio-group>
+      <!-- <ion-item> -->
+      <!-- <ion-input type="number" min="5" [max]="gameDataSvc.getMaxPeople()" step=5 [(ngModel)]="numPeople"></ion-input> -->
+      <!-- </ion-item> -->
+      <ion-item lines="none"> <b>Type of quiz</b></ion-item>
+      <ion-radio-group (ionChange)="gameModeSelected($event)">
+        <ion-item *ngFor="let mode of getGameModes()" lines="none">
+          <ion-label>{{mode}}</ion-label>
+          <ion-radio [value]="mode"></ion-radio>
+        </ion-item>
+      </ion-radio-group>
   </ion-list>
   <ion-row class="ion-justify-content-around">
     <ion-button class="center" (click)="saveSettings()" [disabled]="!modeChosen" routerLink="/quiz"

@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonRadioGroup, ModalController, ToastController } from '@ionic/angular';
 import { GameDataService } from '../game-data.service';
+import { QuizModalComponent } from '../quiz-modal/quiz-modal.component';
 
 @Component({
   selector: 'app-quiz',
@@ -30,13 +31,21 @@ export class QuizPage {
     this.gameDataSvc.resetScore();
     if (this.useMCQuestions()) {
       this.mcAnswers = this.gameDataSvc.getMultipleChoiceAnswers();
-      console.log('mcAnswers set to ', this.mcAnswers);
     }
   }
 
-  async dismiss() {
-    // dismisses the modal which says if the answer is correct or not.
-    await this.modalCtrl.dismiss();
+  async handleSubmit() {
+    const quizModal = await this.modalCtrl.create({
+      component: QuizModalComponent,
+      componentProps: {
+        guessCorrect: this.isGuessCorrect(),
+        correctAnswer: this.gameDataSvc.getCorrectAnswer(),
+      }
+    });
+    await quizModal.present();
+
+    await quizModal.onDidDismiss();
+
     if (this.isGuessCorrect()) {
       this.gameDataSvc.incrScore();
     }
@@ -69,14 +78,13 @@ export class QuizPage {
 
   public choiceSelected(event) {
     this.guess = event.detail.value;
-    console.log('choiceSelected: guess = ', this.guess);
   }
 
   public imageLoaded() {
   }
 
   public useMCQuestions(): boolean {
-    return this.gameDataSvc.getGameMode() === 'Multiple Choice' || this.gameDataSvc.getGameMode() === 'Daily quiz';
+    return this.gameDataSvc.useMCQuestions();
   }
 
   public getTextPlaceHolder(): string {

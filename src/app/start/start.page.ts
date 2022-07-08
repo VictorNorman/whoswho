@@ -23,43 +23,33 @@ export class StartPage implements OnInit {
     private router: Router,
     private toastCtrl: ToastController,
     private storage: Storage,
-    private fns: AngularFireFunctions,
-  )
-  {
+  ) {
   }
 
   async ngOnInit() {
-    // const callable = this.fns.httpsCallable('callMe');
-    // this.cloudMessage = await callable({
-    //   name: 'some-data',
-    // }).toPromise();
-
     await this.storage.create();
     this.organization = (await this.storage.get('organization')) || '';
     this.secret = (await this.storage.get('secret')) || '';
-    this.gameDataSvc.orgLoadedSubj.subscribe(async (val: string) => {
-      if (val) {
-        if (val === 'org loaded') {
-          // good organization and secret, so save the info for next time.
-          this.saveUserInfo();
-          this.router.navigateByUrl('choose-mode');
-        } else if (val === 'bad org or secret') {
-          const toast = await this.toastCtrl.create({
-            message: 'Wrong organization or secret',
-            duration: 1000,
-          });
-          toast.present();
-        }
-      }
-    });
   }
 
-  public onSubmit(): void {
+  public async onSubmit() {
     this.organization = this.organization.trim();
     this.secret = this.secret.trim();
-    // this will start the data service looking for the given org/secret.
-    // when it completes its query, the subscription to the orgLoadSubj will fire, see above.
-    this.gameDataSvc.checkOrgAndSecretAgainstDb(this.organization, this.secret);
+    try {
+      await this.gameDataSvc.checkOrgAndSecretAgainstDb(this.organization, this.secret);
+    } catch {
+      const toast = await this.toastCtrl.create({
+        message: 'Wrong organization or secret',
+        duration: 1000,
+      });
+      await toast.present();
+      return;
+    }
+    await this.gameDataSvc.getPeopleFromDb();
+    // good organization and secret, so save the info for next time.
+    this.saveUserInfo();
+    this.router.navigateByUrl('choose-mode');
+
   }
 
   private saveUserInfo() {

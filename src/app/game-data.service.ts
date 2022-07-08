@@ -45,6 +45,8 @@ export class GameDataService {
   private people: FirestorePeopleRecord[] = [];
   private quizPeople: FirestorePeopleRecord[] = [];
   private org: string;
+  private mcAnswers: string[] = [];
+  private mcAnswersForPerson = 1;
 
   private score = 0;
 
@@ -55,31 +57,57 @@ export class GameDataService {
 
   public async checkOrgAndSecretAgainstDb(org: string, secret: string): Promise<void> {
     this.org = null;
-    const doc = await this.db.collection<FirebaseOrgRecord>('organization').doc(org).get().toPromise();
-    if (!doc.data() || doc.data().secret !== secret) {
-      this.orgLoadedSubj.next('bad org or secret');
-    } else {
-      this.org = org;
-      this.getPeopleFromDb();
-      this.orgLoadedSubj.next('org loaded');
-    }
+    return new Promise<void>(async (resolve, reject) => {
+      const doc = await this.db.collection<FirebaseOrgRecord>('organization').doc(org).get().toPromise();
+      if (!doc.data() || doc.data().secret !== secret) {
+        reject();
+      } else {
+        this.org = org;
+        resolve();
+      }
+    });
   }
 
-  public getPeopleFromDb() {
-    this.currentPerson = 1;
-    this.people = [];
-    this.quizPeople = [];
-    this.db.collection<FirestorePeopleRecord>('people',
-      ref => ref.where('belongsTo', '==', this.org)).valueChanges({ idField: 'id' }).subscribe(
-        people => {
-          if (people) {
-            this.people = people;
-            console.log('got people: ', people);
-            console.log('calling getDaily');
-            this.getDailyQuizFromDb();
+  public async getPeopleFromDb() {
+    return new Promise<void>((resolve, reject) => {
+      this.currentPerson = 1;
+      this.people = [];
+      this.quizPeople = [];
+      this.db.collection<FirestorePeopleRecord>('people',
+        ref => ref.where('belongsTo', '==', this.org)).valueChanges({ idField: 'id' }).subscribe(
+          people => {
+            if (people) {
+              this.people = people;
+              resolve();
+            }
           }
-        }
-      );
+        );
+    });
+  }
+
+  /**
+   * set quizPeople to the list of people from the latest dailies entry in the database.
+   */
+  public getDailyQuizFromDb(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+
+      this.db.collection<FirebaseDailyQuizPeople>(`organization/${this.org}/dailies`,
+        ref => ref.orderBy('timestamp', 'desc')).valueChanges().subscribe(
+          res => {
+            // We have all the people already, so we can use the ids to just
+            // reference the entries in people...  TODO: probably want to not
+            // pull all people each time.
+            this.quizPeople = res[0].people.map(personId =>
+              this.people.find((p) => p.id === personId.doc));
+            this.numPersonsInQuiz = this.quizPeople.length;
+            // If we are in multiple choice mode, we need to recompute the
+            // mcAnswers now.
+            if (this.useMCQuestions()) {
+              this.computeMultipleChoiceAnswers();
+            }
+            resolve();
+          });
+    });
   }
 
   public getGameModes(): string[] {
@@ -87,12 +115,15 @@ export class GameDataService {
   }
 
   public setGameMode(mode: string): void {
-    console.log('game mode set to ', mode);
     this.chosenGameMode = mode;
   }
 
   public getGameMode(): string {
     return this.chosenGameMode;
+  }
+
+  public useMCQuestions(): boolean {
+    return this.getGameMode() === 'Multiple Choice' || this.getGameMode() === 'Daily quiz';
   }
 
   public incrScore() {
@@ -136,11 +167,10 @@ export class GameDataService {
   }
 
   public pickPeopleForQuiz(): void {
-      this.quizPeople = this.pickNRandomPeople();
+    this.quizPeople = this.pickNRandomPeople();
   }
 
   public getPerson(): FirestorePeopleRecord {
-    console.log('getPerson: index is', this.getCurrentPerson() - 1);
     return this.quizPeople[this.getCurrentPerson() - 1];
   }
 
@@ -175,9 +205,16 @@ export class GameDataService {
         return 'No hint';
     }
   }
+  public getMultipleChoiceAnswers(): string[] {
+    if (this.currentPerson !== this.mcAnswersForPerson) {
+      this.computeMultipleChoiceAnswers();
+    }
+    return this.mcAnswers;
+  }
 
   // build up random wrong answers for the multiple choice format
-  public getMultipleChoiceAnswers(): string[] {
+  private computeMultipleChoiceAnswers(): void {
+    // console.log('computeMCAnswers: getPerson is', this.getPerson());
     const results = [this.makeFullName(this.getPerson())];
     // 4 multiple choice answers
     while (results.length !== 4) {
@@ -187,27 +224,10 @@ export class GameDataService {
         results.push(name);
       }
     }
-    return this.shuffle(results);
+    this.mcAnswers = this.shuffle(results);
+    // console.log('mcAnswers = ', this.mcAnswers);
+    this.mcAnswersForPerson = this.currentPerson;
   }
-
-  /**
-   * set quizPeople to the list of people from the latest dailies entry in the database.
-   */
-  private getDailyQuizFromDb(): void {
-    this.db.collection<FirebaseDailyQuizPeople>(`organization/${this.org}/dailies`,
-      ref => ref.orderBy('timestamp', 'desc')).valueChanges().subscribe(
-        res => {
-          // We have all the people already, so we can use the ids to just
-          // reference the entries in people...  TODO: probably want to not
-          // pull all people each time.
-          this.quizPeople = res[0].people.map(personId =>
-            this.people.find((p) => p.id === personId.doc));
-          console.log('quiz people retrieved: ', this.quizPeople);
-          this.numPersonsInQuiz = this.quizPeople.length;
-        });
-  }
-
-
 
   private getRandomPerson(people: FirestorePeopleRecord[]) {
     return people[Math.floor(Math.random() * people.length)];

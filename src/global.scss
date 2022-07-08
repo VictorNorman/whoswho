@@ -25,3 +25,75 @@
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
 
+@media only screen and (min-width: 500px) {
+    body {
+        max-width: 400px;
+        left: 25%;
+        background: black;
+    }
+}
+
+
+/* quiz-modal */
+
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.center-text {
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.green-modal {
+    --background: linear-gradient(to bottom right, lightgreen, green);
+}
+
+.red-modal {
+    --background: linear-gradient(to bottom right, pink, red);
+}
+
+ion-modal {
+    &::part(content) {
+        // --background: linear-gradient(to bottom right, lightgreen, green);
+        top: 58%;
+        height: 100px;
+        width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+        border-radius: 20px;
+        animation-name: zoomin;
+        animation-duration: 0.3s;
+    }
+}
+
+@keyframes zoomin {
+    0% {
+        transform: scale(0);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.dismiss-button {
+    width: 10em;
+    margin-bottom: 8px;
+    --border-radius: 1em;
+}
+
+.answer-text {
+    margin-top: 8px;
+}
+
+.space-after {
+    padding-right: 10px;
+}
+
+.correct-answer {
+    font-weight: bold;
+}

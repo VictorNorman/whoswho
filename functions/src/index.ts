@@ -1,4 +1,4 @@
-import * as functions from "firebase-functions";
+// import * as functions from "firebase-functions";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const cors = require("cors")({origin: true});
@@ -12,13 +12,13 @@ import * as functions from "firebase-functions";
 //   });
 // });
 
-export const callMe = functions.region("us-central1").https
-    .onCall((data, ctx) => {
-      return {
-        answer: "Hello from callMe in firebase",
-        data,
-        ctx,
-      };
-    });
+// export const callMe = functions.region("us-central1").https
+//     .onCall((data, ctx) => {
+//       return {
+//         answer: "Hello from callMe in firebase",
+//         data,
+//         ctx,
+//       };
+//     });
 
 

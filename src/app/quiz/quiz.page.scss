@@ -21,20 +21,12 @@ ion-progress-bar {
   margin-left: auto;
   margin-right: auto;
 }
+
 .center-text {
   display: table;
   margin-left: auto;
   margin-right: auto;
 }
-
-// ion-spinner {
-//   width: 5em;
-//   height: 5em;
-//   display: block;
-//   margin-left: auto;
-//   margin-right: auto;
-//   z-index: 2;
-// }
 
 .green-modal {
   --background: linear-gradient(to bottom right, lightgreen, green);
@@ -46,14 +38,14 @@ ion-progress-bar {
 
 ion-modal {
   top: 58%;
-  height: 100px;
-  width: 90%;
+  // height: 100px;
+  // width: 90%;
   // center it:
-  margin-left: auto;
-  margin-right: auto;
-  border-radius: 20px;
-  animation-name: zoomin;
-  animation-duration: 0.3s;
+  // margin-left: auto;
+  // margin-right: auto;
+  // border-radius: 20px;
+  // animation-name: zoomin;
+  // animation-duration: 0.3s;
 }
 
 @keyframes zoomin {

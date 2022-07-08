@@ -15,6 +15,7 @@ import { IonicStorageModule } from '@ionic/storage-angular';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { AngularFireFunctionsModule } from '@angular/fire/compat/functions';
+import { QuizModalComponentModule } from './quiz-modal/quiz-modal.module';
 
 // import './firebase-initialization';
 
@@ -25,6 +26,7 @@ import { AngularFireFunctionsModule } from '@angular/fire/compat/functions';
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,
+    QuizModalComponentModule,
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFirestoreModule,
     AngularFirestoreModule.enablePersistence(),   // not sure if line above is needed.
