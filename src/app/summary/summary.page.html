@@ -6,7 +6,7 @@
 
 <ion-content>
 
-  <ion-img src="assets/logo.png"></ion-img>
+  <ion-img src="assets/logo.svg"></ion-img>
   <h3 class="center">You got {{dataSvc.getScore()}} out of {{dataSvc.getNumPersonsInQuiz()}} right.</h3>
   <ion-item lines="none" class="center-text">
     {{genNstars(dataSvc.getScore())}}
@@ -18,7 +18,7 @@
     <h4>Try again with the same group?</h4>
   </ion-router-link>
   <ion-router-link class="center" (click)="restart()" routerLink="/choose-mode">
-    <h4>Start from beginning with a new group</h4>
+    <h4>Start again with a new group</h4>
   </ion-router-link>
 
 </ion-content>

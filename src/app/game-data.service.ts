@@ -206,7 +206,7 @@ export class GameDataService {
     }
   }
   public getMultipleChoiceAnswers(): string[] {
-    if (this.currentPerson !== this.mcAnswersForPerson) {
+    if (this.mcAnswers.length === 0 || this.currentPerson !== this.mcAnswersForPerson) {
       this.computeMultipleChoiceAnswers();
     }
     return this.mcAnswers;

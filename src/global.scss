@@ -25,6 +25,11 @@
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
 
+
+* {
+    font-family: 'Encode Sans Semi Expanded', sans-serif;
+}
+
 @media only screen and (min-width: 500px) {
     body {
         max-width: 400px;
@@ -96,4 +101,9 @@ ion-modal {
 
 .correct-answer {
     font-weight: bold;
+}
+
+ion-button {
+    --color: #9eaea2;
+    --background: #25646a;
 }
