@@ -9,7 +9,7 @@ import { GameDataService } from '../game-data.service';
 })
 export class ChooseModePage implements OnInit {
   public modeChosen = false;
-  public numPeople = 10;
+  public numPeople = 5;
 
   constructor(
     public gameDataSvc: GameDataService,
@@ -24,7 +24,7 @@ export class ChooseModePage implements OnInit {
     await this.gameDataSvc.getDailyQuizFromDb();
     // I have such timing problems with getting the data and
     // computing the mcanswers, so I'll delay going to the page for a bit.
-    setTimeout(() => this.router.navigateByUrl('/quiz'), 500);
+    setTimeout(() => this.router.navigateByUrl('/choose-difficulty'), 500);
   }
 
   public getGameModes(): string[] {
@@ -37,9 +37,13 @@ export class ChooseModePage implements OnInit {
   }
 
   // the game mode is already saved in the function above.
-  public saveSettings(): void {
+  public useCustomQuiz(): void {
+    console.log('saving # of persons = ', this.numPeople);
     this.gameDataSvc.setNumPersonsInQuiz(this.numPeople);
     this.gameDataSvc.pickPeopleForQuiz();
+    // I have such timing problems with getting the data and
+    // computing the mcanswers, so I'll delay going to the page for a bit.
+    setTimeout(() => this.router.navigateByUrl('/choose-difficulty'), 500);
   }
 
   public customFormatter(value: number): string {

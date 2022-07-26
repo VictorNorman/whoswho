@@ -23,6 +23,10 @@ const routes: Routes = [
     path: 'start',
     loadChildren: () => import('./start/start.module').then( m => m.StartPageModule)
   },
+  {
+    path: 'choose-difficulty',
+    loadChildren: () => import('./choose-difficulty/choose-difficulty.module').then( m => m.ChooseDifficultyPageModule)
+  },
 ];
 
 @NgModule({

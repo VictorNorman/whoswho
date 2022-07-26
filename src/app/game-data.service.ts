@@ -4,8 +4,8 @@ import { BehaviorSubject } from 'rxjs';
 
 export const GAME_MODES: string[] = [
   'Multiple Choice',
-  'Last name only',
   'First name only',
+  'Last name only',
   'Full name required',
   // 'Daily quiz',   // uses multiple choice
 ];
@@ -211,6 +211,17 @@ export class GameDataService {
     }
     return this.mcAnswers;
   }
+
+  public getDifficulty(mode: string): string {
+    switch (mode) {
+      case 'Multiple Choice': return 'Easy';
+      case 'First name only': return 'Moderate';
+      case 'Last name only': return 'Hard';
+      case 'Full name required': return 'Very Hard';
+      default: return 'Waaa?';
+    }
+  }
+
 
   // build up random wrong answers for the multiple choice format
   private computeMultipleChoiceAnswers(): void {

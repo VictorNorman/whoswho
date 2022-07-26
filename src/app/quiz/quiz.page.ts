@@ -35,6 +35,7 @@ export class QuizPage {
   }
 
   async handleSubmit() {
+    this.guess = this.guess.trim();
     const quizModal = await this.modalCtrl.create({
       component: QuizModalComponent,
       componentProps: {

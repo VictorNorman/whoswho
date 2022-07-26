@@ -9,7 +9,9 @@ import { Share } from '@capacitor/share';
 })
 export class SummaryPage implements OnInit {
 
-  constructor(public dataSvc: GameDataService) { }
+  constructor(
+    public dataSvc: GameDataService,
+  ) { }
 
   ngOnInit() {
   }

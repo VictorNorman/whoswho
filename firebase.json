@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "whoswho",
+    "site": "imagebearers",
     "public": "www",
     "ignore": [
       "firebase.json",
