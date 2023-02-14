@@ -27,7 +27,7 @@ export class SummaryPage implements OnInit {
   }
 
   public genNstars(n: number) {
-    return '⭐'.repeat(n);
+    return `⭐ x ${n}`;
   }
 
   public async shareResults() {

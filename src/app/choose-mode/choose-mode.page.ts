@@ -31,14 +31,14 @@ export class ChooseModePage implements OnInit {
     return this.gameDataSvc.getGameModes();
   }
 
-  public gameModeSelected(event): void {
+  public gameModeSelected(event: any): void {
     this.modeChosen = true;
     this.gameDataSvc.setGameMode(event.detail.value);
   }
 
   // the game mode is already saved in the function above.
   public useCustomQuiz(): void {
-    console.log('saving # of persons = ', this.numPeople);
+    // console.log('saving # of persons = ', this.numPeople);
     this.gameDataSvc.setNumPersonsInQuiz(this.numPeople);
     this.gameDataSvc.pickPeopleForQuiz();
     // I have such timing problems with getting the data and

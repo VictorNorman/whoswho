@@ -3,7 +3,8 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { BehaviorSubject } from 'rxjs';
 
 export const GAME_MODES: string[] = [
-  'Multiple Choice',
+  'Multiple choice',
+  'First name multiple choice',
   'First name only',
   'Last name only',
   'Full name required',
@@ -35,16 +36,16 @@ export class GameDataService {
 
   public orgLoadedSubj: BehaviorSubject<string> = new BehaviorSubject<string>('not loaded yet');
 
-  private chosenGameMode: string = null;
+  private chosenGameMode = '';
   /**
    * The current person being shown for the user to guess.
    */
   private currentPerson = 1;
-  private numPersonsInQuiz: number;
+  private numPersonsInQuiz = 0;
 
   private people: FirestorePeopleRecord[] = [];
-  private quizPeople: FirestorePeopleRecord[] = [];
-  private org: string;
+  private quizPeople: FirestorePeopleRecord[] = [] ;
+  private org = '';
   private mcAnswers: string[] = [];
   private mcAnswersForPerson = 1;
 
@@ -56,14 +57,17 @@ export class GameDataService {
   }
 
   public async checkOrgAndSecretAgainstDb(org: string, secret: string): Promise<void> {
-    this.org = null;
+    this.org = '';
     return new Promise<void>(async (resolve, reject) => {
       const doc = await this.db.collection<FirebaseOrgRecord>('organization').doc(org).get().toPromise();
-      if (!doc.data() || doc.data().secret !== secret) {
-        reject();
-      } else {
-        this.org = org;
-        resolve();
+      if (doc) {
+        const docData = doc.data();
+        if (!docData || docData.secret !== secret) {
+          reject();
+        } else {
+          this.org = org;
+          resolve();
+        }
       }
     });
   }
@@ -98,7 +102,7 @@ export class GameDataService {
             // reference the entries in people...  TODO: probably want to not
             // pull all people each time.
             this.quizPeople = res[0].people.map(personId =>
-              this.people.find((p) => p.id === personId.doc));
+              this.people.find((p) => p.id === personId.doc)) as FirestorePeopleRecord[];
             this.numPersonsInQuiz = this.quizPeople.length;
             // If we are in multiple choice mode, we need to recompute the
             // mcAnswers now.
@@ -123,7 +127,8 @@ export class GameDataService {
   }
 
   public useMCQuestions(): boolean {
-    return this.getGameMode() === 'Multiple Choice' || this.getGameMode() === 'Daily quiz';
+    return this.getGameMode() === 'Multiple choice' || this.getGameMode() === 'Daily quiz' ||
+      this.getGameMode() === 'First name multiple choice';
   }
 
   public incrScore() {
@@ -177,15 +182,18 @@ export class GameDataService {
   public isGuessCorrect(guess: string): boolean {
     switch (this.chosenGameMode) {
       case 'Full name required':
-      case 'Multiple Choice':
+      case 'Multiple choice':
       case 'Daily quiz':
         return guess.toUpperCase() === `${this.getPerson().firstName.toUpperCase()} ${this.getPerson().lastName.toUpperCase()}` ||
           guess.toUpperCase() === `${this.getPerson().nickName.toUpperCase()} ${this.getPerson().lastName.toUpperCase()}`;
       case 'Last name only':
         return guess.toUpperCase() === this.getPerson().lastName.toUpperCase();
+      case 'First name multiple choice':
       case 'First name only':
         return guess.toUpperCase() === this.getPerson().firstName.toUpperCase() ||
           guess.toUpperCase() === this.getPerson().nickName.toUpperCase();
+      default:
+        return false;
     }
   }
 
@@ -214,7 +222,8 @@ export class GameDataService {
 
   public getDifficulty(mode: string): string {
     switch (mode) {
-      case 'Multiple Choice': return 'Easy';
+      case 'Multiple choice': return 'Easy';
+      case 'First name multiple choice': return 'Easy';
       case 'First name only': return 'Moderate';
       case 'Last name only': return 'Hard';
       case 'Full name required': return 'Very Hard';

@@ -1,0 +1,11 @@
+To generate icons:
+
+main ✘ ✹ ✭  vtn2@Mac52078  ...src/assets/icons 
+$ npx pwa-asset-generator ../logo.svg -i ../../index.html --manifest ../../manifest.webmanifest
+
+To build and deploy:
+
+$ ionic build --prod && firebase deploy
+
+Answer N to installing functions.
+

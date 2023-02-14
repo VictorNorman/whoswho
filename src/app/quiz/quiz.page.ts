@@ -11,7 +11,7 @@ import { QuizModalComponent } from '../quiz-modal/quiz-modal.component';
 })
 export class QuizPage {
 
-  @ViewChild('radiogroup', { static: false }) radioGroup: IonRadioGroup;
+  @ViewChild('radiogroup', { static: false }) radioGroup!: IonRadioGroup;
 
   public title = 'Image Bearers';
   public guess = '';   // the user's guess of who this is.
@@ -30,7 +30,12 @@ export class QuizPage {
     this.guessIsCorrect = false;
     this.gameDataSvc.resetScore();
     if (this.useMCQuestions()) {
-      this.mcAnswers = this.gameDataSvc.getMultipleChoiceAnswers();
+      if (this.gameDataSvc.getGameMode() === 'First name multiple choice') {
+        this.mcAnswers = this.gameDataSvc.getMultipleChoiceAnswers().map(a => a.split(' ')[0]);
+        console.table(this.mcAnswers);
+      } else {    // full mc or daily quiz mc.
+        this.mcAnswers = this.gameDataSvc.getMultipleChoiceAnswers();
+      }
     }
   }
 
@@ -56,7 +61,12 @@ export class QuizPage {
       this.guess = '';
       if (this.useMCQuestions()) {
         // load up some new random answers;
-        this.mcAnswers = this.gameDataSvc.getMultipleChoiceAnswers();
+        if (this.gameDataSvc.getGameMode() === 'First name multiple choice') {
+          this.mcAnswers = this.gameDataSvc.getMultipleChoiceAnswers().map(a => a.split(' ')[0]);
+          console.table(this.mcAnswers);
+        } else {    // full mc or daily quiz mc.
+          this.mcAnswers = this.gameDataSvc.getMultipleChoiceAnswers();
+        }
         // Clear the choice in the radio group.
         this.radioGroup.value = '';
       }
@@ -77,7 +87,7 @@ export class QuizPage {
     return this.gameDataSvc.getPerson();
   }
 
-  public choiceSelected(event) {
+  public choiceSelected(event: any) {
     this.guess = event.detail.value;
   }
 
@@ -90,7 +100,8 @@ export class QuizPage {
 
   public getTextPlaceHolder(): string {
     switch (this.gameDataSvc.getGameMode()) {
-      case 'Multiple Choice':
+      case 'First name multiple choice':
+      case 'Multiple choice':
         return 'Not used';
       case 'Last name only':
         return 'Enter last name';
@@ -98,6 +109,8 @@ export class QuizPage {
         return 'Enter first name';
       case 'Full name required':
         return 'Enter full name';
+      default:
+        return 'unknown';
     }
   }
 

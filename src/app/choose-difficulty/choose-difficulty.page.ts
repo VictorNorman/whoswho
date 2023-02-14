@@ -23,7 +23,7 @@ export class ChooseDifficultyPage implements OnInit {
     return this.gameDataSvc.getGameModes();
   }
 
-  public gameModeSelected(event): void {
+  public gameModeSelected(event: any): void {
     this.modeChosen = true;
     this.gameDataSvc.setGameMode(event.detail.value);
   }

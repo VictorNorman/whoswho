@@ -8,8 +8,8 @@ import { GameDataService } from '../game-data.service';
   styleUrls: ['./quiz-modal.component.scss'],
 })
 export class QuizModalComponent implements OnInit {
-  @Input() guessCorrect: boolean;
-  @Input() correctAnswer: string;
+  @Input() guessCorrect = false;
+  @Input() correctAnswer = '';
 
   constructor(
     private modalCtrl: ModalController,

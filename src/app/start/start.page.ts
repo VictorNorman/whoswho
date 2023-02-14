@@ -13,8 +13,8 @@ import { AngularFireFunctions } from '@angular/fire/compat/functions';
 export class StartPage implements OnInit {
 
   public title = 'Image Bearers';
-  public organization: string;
-  public secret: string;
+  public organization = '';
+  public secret = '';
 
   cloudMessage = '';
 
