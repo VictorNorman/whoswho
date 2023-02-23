@@ -1,4 +1,3 @@
-
 <ion-header>
   <ion-toolbar>
     <ion-title>Game settings</ion-title>
@@ -27,13 +26,14 @@
       How many people should be in the quiz?
     </ion-item>
     <ion-item lines="none">
-      <ion-range min=5 step=5 [max]="gameDataSvc.getMaxPeople()" [pinFormatter]="customFormatter" [pin]="true"
+      <!-- <ion-range min=5 step=5 [max]="gameDataSvc.getMaxPeople()" [pinFormatter]="customFormatter" [pin]="true"
         color="secondary" [(ngModel)]="numPeople">
         <ion-label slot="start">5</ion-label>
         <ion-label slot="end">{{gameDataSvc.getMaxPeople()}}</ion-label>
-      </ion-range>
+      </ion-range> -->
+      <input class="center" type="number" id="quantity" name="quantity" value="5" min="5" max="{{maxPeople}}" step="5" [(ngModel)]="numPeople">
     </ion-item>
-    <ion-row ion-justify-content-around>
+    <ion-row class="ion-justify-content-around">
       <ion-button class="center" (click)="useCustomQuiz()">Custom Quiz</ion-button>
     </ion-row>
     <!-- <ion-item> -->

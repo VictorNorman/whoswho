@@ -10,13 +10,17 @@ import { GameDataService } from '../game-data.service';
 export class ChooseModePage implements OnInit {
   public modeChosen = false;
   public numPeople = 5;
+  public maxPeople = 5;
 
   constructor(
     public gameDataSvc: GameDataService,
     private router: Router,
-  ) { }
+  ) {
+    this.maxPeople = this.gameDataSvc.getMaxPeople();
+  }
 
   ngOnInit() {
+
   }
 
   public async dailyQuiz() {

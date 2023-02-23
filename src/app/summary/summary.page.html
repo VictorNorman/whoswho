@@ -9,7 +9,7 @@
   <ion-img src="assets/logo.svg"></ion-img>
   <h3 class="center">You got {{dataSvc.getScore()}} out of {{dataSvc.getNumPersonsInQuiz()}} right</h3>
   <h3 class="center">on {{dataSvc.getDifficulty(dataSvc.getGameMode())}} mode!</h3>
-  <ion-item lines="none" class="center-text">
+  <ion-item lines="none" class="center-text stars">
     {{genNstars(dataSvc.getScore())}}
   </ion-item>
   <ion-item lines="none" class="center-text">

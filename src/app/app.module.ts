@@ -16,9 +16,11 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { AngularFireFunctionsModule } from '@angular/fire/compat/functions';
 import { QuizModalComponentModule } from './quiz-modal/quiz-modal.module';
+
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as Sentry from '@sentry/angular';
+
 
 // import './firebase-initialization';
 
