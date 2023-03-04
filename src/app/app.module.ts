@@ -9,12 +9,12 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { AngularFireMessagingModule } from '@angular/fire/compat/messaging/';
 import 'firebase/compat/storage';
 import { firebaseConfig } from './credentials';
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
-import { AngularFireFunctionsModule } from '@angular/fire/compat/functions';
 import { QuizModalComponentModule } from './quiz-modal/quiz-modal.module';
 
 import { FormsModule } from '@angular/forms';
@@ -35,9 +35,9 @@ import * as Sentry from '@sentry/angular';
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFirestoreModule,
     AngularFirestoreModule.enablePersistence(),   // not sure if line above is needed.
-    AngularFireFunctionsModule,
+    AngularFireMessagingModule,
     IonicStorageModule.forRoot(),
-    ServiceWorkerModule.register('ngsw-worker.js', {
+    ServiceWorkerModule.register('combined-sw.js', {
       enabled: environment.production,
       // Register the ServiceWorker as soon as the application is stable
       // or after 30 seconds (whichever comes first).

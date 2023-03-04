@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { GameDataService } from '../game-data.service';
+import { GameDataService } from '../services/game-data.service';
 import { Share } from '@capacitor/share';
 
 @Component({

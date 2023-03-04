@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
-import { GameDataService } from '../game-data.service';
+import { GameDataService } from '../services/game-data.service';
 import { Storage } from '@ionic/storage-angular';
 import { AngularFireFunctions } from '@angular/fire/compat/functions';
+import { MessagingService } from '../services/messaging.service';
 
 @Component({
   selector: 'app-start',
@@ -12,18 +13,18 @@ import { AngularFireFunctions } from '@angular/fire/compat/functions';
 })
 export class StartPage implements OnInit {
 
-  public title = 'Image Bearers';
   public organization = '';
   public secret = '';
-
-  cloudMessage = '';
 
   constructor(
     private gameDataSvc: GameDataService,
     private router: Router,
     private toastCtrl: ToastController,
     private storage: Storage,
+    private msgSvc: MessagingService,
   ) {
+    // get the token for push notifications.
+    this.msgSvc.requestPermission();
   }
 
   async ngOnInit() {

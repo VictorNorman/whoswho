@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonRadioGroup, ModalController, ToastController } from '@ionic/angular';
-import { GameDataService } from '../game-data.service';
+import { GameDataService } from '../services/game-data.service';
 import { QuizModalComponent } from '../quiz-modal/quiz-modal.component';
 
 @Component({

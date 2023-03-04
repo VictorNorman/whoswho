@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { GameDataService } from '../game-data.service';
+import { GameDataService } from '../services/game-data.service';
 
 @Component({
   selector: 'app-choose-mode',

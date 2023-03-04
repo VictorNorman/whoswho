@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { GameDataService } from '../game-data.service';
+import { GameDataService } from '../services/game-data.service';
 
 @Component({
   selector: 'app-quiz-modal',

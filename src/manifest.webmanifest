@@ -1,8 +1,9 @@
 {
   "name": "Image Bearers",
   "short_name": "Image Bearers",
+  "gcm_sender_id": "909733348055",
   "theme_color": "#1976d2",
-  "background_color": "#fafafa",
+  "background_color": "#fff",
   "display": "standalone",
   "scope": "./",
   "start_url": "./",
