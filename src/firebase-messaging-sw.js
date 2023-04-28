@@ -17,3 +17,20 @@ firebase.initializeApp({
 // Retrieve an instance of Firebase Messaging so that it can handle background
 // messages.
 messaging = firebase.messaging();
+
+self.addEventListener('notificationclick', event => {
+    event.waitUntil(
+        clients.matchAll().then(clientsArr => {
+            // Check if the PWA is already open in a tab
+            const pwaUrl = 'https://imagebearers.web.app';
+            const pwaClient = clientsArr.find(client => client.url === pwaUrl);
+            if (pwaClient) {
+                // If the PWA is already open, switch to that tab
+                pwaClient.focus();
+            } else {
+                // If the PWA is not open, open it in a new tab
+                clients.openWindow(pwaUrl);
+            }
+        })
+    );
+});

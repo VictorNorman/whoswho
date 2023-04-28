@@ -40,7 +40,8 @@ export class SummaryPage implements OnInit {
 
     await Share.share({
       title: 'Share your score',
-      text: `Image Bearers on ${todayStr}: ${this.genNstars(this.dataSvc.getScore())}`,
+      // eslint-disable-next-line max-len
+      text: `Image Bearers on ${todayStr}: ${this.genNstars(this.dataSvc.getScore())} on ${this.dataSvc.getDifficulty(this.dataSvc.getGameMode())} mode!`,
       dialogTitle: 'Share your score',
     });
   }

@@ -8,7 +8,7 @@
       <div *ngIf="imageNotLoaded" class="spinner-area">
       <ion-spinner class="image-spinner"></ion-spinner>
     </div> -->
-    <ion-img class="person-image" [src]="getPerson().imageData"></ion-img>
+    <ion-img class="person-image" [src]="getPerson().imageData || 'assets/icons/icon-96x96.png'"></ion-img>
 
     <!-- Multiple-choice -->
     <div *ngIf="useMCQuestions()">
