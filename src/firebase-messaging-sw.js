@@ -18,18 +18,25 @@ firebase.initializeApp({
 // messages.
 messaging = firebase.messaging();
 
-self.addEventListener('notificationclick', event => {
+self.addEventListener('notificationclick', function(event) {
     event.waitUntil(
-        clients.matchAll().then(clientsArr => {
+        clients.matchAll({
+            type: 'window',
+            includeUncontrolled: true,
+        }).then(clientsArr => {
             // Check if the PWA is already open in a tab
-            const pwaUrl = 'https://imagebearers.web.app';
+            const pwaUrl = new URL("/", location).href;
+            console.log("pwaURL = ", pwaUrl);
             const pwaClient = clientsArr.find(client => client.url === pwaUrl);
             if (pwaClient) {
+                console.log('pwaClient found');
                 // If the PWA is already open, switch to that tab
                 pwaClient.focus();
             } else {
+                console.log('pwaClient NOT found: calling openWindow');
                 // If the PWA is not open, open it in a new tab
-                clients.openWindow(pwaUrl);
+                const res = clients.openWindow(pwaUrl);
+                console.log('res = ', res);
             }
         })
     );

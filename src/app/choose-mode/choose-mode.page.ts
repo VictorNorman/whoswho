@@ -28,7 +28,7 @@ export class ChooseModePage implements OnInit {
     await this.gameDataSvc.getDailyQuizFromDb();
     // I have such timing problems with getting the data and
     // computing the mcanswers, so I'll delay going to the page for a bit.
-    setTimeout(() => this.router.navigateByUrl('/choose-difficulty'), 500);
+    setTimeout(() => this.router.navigateByUrl('/choose-difficulty'), 800);
   }
 
   public getGameModes(): string[] {

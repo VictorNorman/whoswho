@@ -38,12 +38,16 @@ export class SummaryPage implements OnInit {
     const yyyy = today.getFullYear();
     const todayStr = `${mm}/${dd}/${yyyy}`;
 
-    await Share.share({
-      title: 'Share your score',
-      // eslint-disable-next-line max-len
-      text: `Image Bearers on ${todayStr}: ${this.genNstars(this.dataSvc.getScore())} on ${this.dataSvc.getDifficulty(this.dataSvc.getGameMode())} mode!`,
-      dialogTitle: 'Share your score',
-    });
+    // if the user cancels Share, that's OK. catch and do nothing.
+    try {
+      await Share.share({
+        title: 'Share your score',
+        // eslint-disable-next-line max-len
+        text: `Image Bearers on ${todayStr}: ${this.genNstars(this.dataSvc.getScore())} on ${this.dataSvc.getDifficulty(this.dataSvc.getGameMode())} mode!`,
+        dialogTitle: 'Share your score',
+      });
+    } catch (e) {
+    }
   }
 
   // '🟨';
