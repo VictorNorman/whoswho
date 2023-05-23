@@ -37,7 +37,7 @@
     "@sentry/angular": "^7.37.2",
     "@sentry/tracing": "^7.37.2",
     "firebase": "^9.17.1",
-    "firebase-functions": "^4.2.1",
+    "firebase-functions": "^4.4.0",
     "ngx-material-rating": "^2.0.0",
     "ngx-range": "^1.1.0",
     "rxjs": "~7.8.0",
