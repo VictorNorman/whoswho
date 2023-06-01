@@ -15,6 +15,7 @@ export class StartPage implements OnInit {
 
   public organization = '';
   public secret = '';
+  public disableSubmit = true;
 
   constructor(
     private gameDataSvc: GameDataService,
@@ -50,7 +51,6 @@ export class StartPage implements OnInit {
     // good organization and secret, so save the info for next time.
     this.saveUserInfo();
     this.router.navigateByUrl('choose-mode');
-
   }
 
   private saveUserInfo() {

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonRadioGroup, ModalController, ToastController } from '@ionic/angular';
 import { GameDataService } from '../services/game-data.service';
@@ -41,16 +41,11 @@ export class QuizPage {
 
   async handleSubmit() {
     this.guess = this.guess.trim();
-    const quizModal = await this.modalCtrl.create({
-      component: QuizModalComponent,
-      componentProps: {
-        guessCorrect: this.isGuessCorrect(),
-        correctAnswer: this.gameDataSvc.getCorrectAnswer(),
-      }
-    });
-    await quizModal.present();
+    this.guessIsCorrect = this.isGuessCorrect();
+  }
 
-    await quizModal.onDidDismiss();
+  async dismiss() {
+    await this.modalCtrl.dismiss(null, 'confirm');
 
     if (this.isGuessCorrect()) {
       this.gameDataSvc.incrScore();

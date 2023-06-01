@@ -9,11 +9,15 @@ import { Share } from '@capacitor/share';
 })
 export class SummaryPage implements OnInit {
 
+  public streak = -1;
+
   constructor(
     public dataSvc: GameDataService,
   ) { }
 
   ngOnInit() {
+    this.dataSvc.incrementStreak();
+    this.streak = this.dataSvc.getStreak();
   }
 
   public redoQuiz(): void {

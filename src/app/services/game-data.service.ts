@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { BehaviorSubject } from 'rxjs';
+import { Storage } from '@ionic/storage-angular';
 
 export const GAME_MODES: string[] = [
   'Multiple choice',
@@ -27,6 +28,7 @@ interface FirebaseOrgRecord {
 
 interface FirebaseDailyQuizPeople {
   people: Array<{ doc: string }>;
+  timestamp: firebase.default.firestore.Timestamp;
 }
 
 @Injectable({
@@ -51,9 +53,23 @@ export class GameDataService {
 
   private score = 0;
 
+  // store this to compute how many days in a row the daily quiz has been done.
+  private todaysDailyQuizDayOfTheWeek = -1;   // uninitialized
+  private lastDayPlayedDailyQuiz = -1;
+  private streakNum = -1;   // how many days the player has played in a row.
+
   constructor(
     private db: AngularFirestore,
+    private storage: Storage,
   ) {
+    this.getStreakInfoFromStorage();
+  }
+
+  async getStreakInfoFromStorage() {
+    await this.storage.create();
+    // Get the last day of the week the daily quiz was done, from localStorage.
+    this.lastDayPlayedDailyQuiz = Number(await this.storage.get('lastDayPlayedDailyQuiz')) || -1;
+    this.streakNum = Number(await this.storage.get('streak')) || 0;
   }
 
   public async checkOrgAndSecretAgainstDb(org: string, secret: string): Promise<void> {
@@ -96,7 +112,7 @@ export class GameDataService {
     return new Promise<void>((resolve, reject) => {
 
       this.db.collection<FirebaseDailyQuizPeople>(`organization/${this.org}/dailies`,
-        ref => ref.orderBy('timestamp', 'desc')).valueChanges().subscribe(
+        ref => ref.orderBy('timestamp', 'desc').limit(1)).valueChanges().subscribe(
           res => {
             // We have all the people already, so we can use the ids to just
             // reference the entries in people...  TODO: probably want to not
@@ -104,6 +120,10 @@ export class GameDataService {
             this.quizPeople = res[0].people.map(personId =>
               this.people.find((p) => p.id === personId.doc)) as FirestorePeopleRecord[];
             this.numPersonsInQuiz = this.quizPeople.length;
+
+            const d = res[0].timestamp.toDate();
+            this.todaysDailyQuizDayOfTheWeek = d.getDay();
+
             // If we are in multiple choice mode, we need to recompute the
             // mcAnswers now.
             if (this.useMCQuestions()) {
@@ -231,6 +251,32 @@ export class GameDataService {
     }
   }
 
+  // increment streak info if the user was playing the daily quiz.
+  public incrementStreak() {
+    if (this.getGameMode() !== 'Daily Quiz') {
+      return;
+    }
+
+    if (this.lastDayPlayedDailyQuiz === this.todaysDailyQuizDayOfTheWeek) {
+      // player played already today, so don't update anything.
+      return;
+    }
+
+    // first time playing the quiz.
+    if (this.lastDayPlayedDailyQuiz === -1) {
+      this.streakNum = 1;
+    } else if ((this.lastDayPlayedDailyQuiz + 1) % 7 === this.todaysDailyQuizDayOfTheWeek) {
+      // played yesterday and now, so streak continues
+      this.streakNum++;
+    }
+    this.lastDayPlayedDailyQuiz = this.todaysDailyQuizDayOfTheWeek;
+    this.storage.set('lastDayPlayedDailyQuiz', this.lastDayPlayedDailyQuiz);
+    this.storage.set('streak', this.streakNum);
+  }
+
+  public getStreak() {
+    return this.streakNum;
+  }
 
   // build up random wrong answers for the multiple choice format
   private computeMultipleChoiceAnswers(): void {
@@ -269,6 +315,7 @@ export class GameDataService {
     return arr.map(x => [Math.random(), x]).sort(([a], [b]) =>
       (a as number) - (b as number)).map(([_, x]) => x) as T[];
   }
+
 
 
 }

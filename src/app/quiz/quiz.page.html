@@ -1,4 +1,3 @@
-
 <ion-content [fullscreen]="true">
 
   <ion-list>
@@ -38,6 +37,21 @@
       <ion-button id="submit-button" [disabled]="!guess" (click)="handleSubmit()">
         That's my answer!
       </ion-button>
+
+      <ion-modal trigger="submit-button">
+        <ng-template>
+          <ion-content>
+            <ion-text class="center-text answer-text">
+              <ion-icon class="space-after" [name]="isGuessCorrect() ? 'thumbs-up-sharp' : 'thumbs-down-sharp'"></ion-icon>
+              <span>{{isGuessCorrect() ? "Correct! " : "Sorry, that's wrong. "}} This is </span>
+              <div class="correct-answer center-text">
+                {{gameDataSvc.getCorrectAnswer()}}
+              </div>
+            </ion-text>
+            <ion-button class="dismiss-button center" (click)="dismiss()">Got it!</ion-button>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
     </ion-row>
 
   </ion-list>

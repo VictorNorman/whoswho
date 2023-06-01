@@ -10,6 +10,10 @@
   <ion-item lines="none" class="center-text">
     <ion-button (click)="shareResults()">Share</ion-button>
   </ion-item>
+  <ion-item lines="none" class="center-text larger-font" *ngIf="streak > 0">
+    You have played the Daily Quiz {{streak}} days in a row! Good job!
+  </ion-item>
+
   <ion-router-link class="center" (click)="redoQuiz()" routerLink="/quiz">
     <h4>Try again with the same group?</h4>
   </ion-router-link>

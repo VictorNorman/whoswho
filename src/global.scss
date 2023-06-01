@@ -53,37 +53,16 @@
     margin-right: auto;
 }
 
-.green-modal {
-    --background: linear-gradient(to bottom right, lightgreen, green);
-}
-
-.red-modal {
-    --background: linear-gradient(to bottom right, pink, red);
-}
-
 ion-modal {
     &::part(content) {
-        // --background: linear-gradient(to bottom right, lightgreen, green);
-        top: 58%;
         height: 100px;
         width: 90%;
         margin-left: auto;
         margin-right: auto;
         border-radius: 20px;
-        animation-name: zoomin;
-        animation-duration: 0.3s;
     }
 }
 
-@keyframes zoomin {
-    0% {
-        transform: scale(0);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
 
 .dismiss-button {
     width: 10em;
