@@ -1,9 +1,9 @@
 export const firebaseConfig = {
-    apiKey: 'AIzaSyAvyM5ZTO0f0FZvlXjlBsC38gVWcheKsFs',
-    authDomain: 'vtn2-whoswho-test.firebaseapp.com',
-    projectId: 'vtn2-whoswho-test',
-    storageBucket: 'vtn2-whoswho-test.appspot.com',
-    messagingSenderId: '117098309178',
-    appId: '1:117098309178:web:040961eb51fd313df3f703'
+    apiKey: 'AIzaSyCMZN9f0sB2FSXWfkT7PnJFntRUYaR-Mbc',
+    authDomain: 'vtn2-whoswho.firebaseapp.com',
+    projectId: 'vtn2-whoswho',
+    storageBucket: 'vtn2-whoswho.appspot.com',
+    messagingSenderId: '909733348055',
+    appId: '1:909733348055:web:bfc2b3eb8de22b647fa692',
+    measurementId: 'G-S41MY9LVY7'
 };
-
