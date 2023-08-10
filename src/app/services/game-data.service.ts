@@ -48,7 +48,7 @@ export class GameDataService {
   private people: FirestorePeopleRecord[] = [];
   private quizPeople: FirestorePeopleRecord[] = [] ;
   private org = '';
-  private mcAnswers: string[] = [];
+  private mcAnswers: FirestorePeopleRecord[] = [];
   private mcAnswersForPerson = 1;
 
   private score = 0;
@@ -237,7 +237,7 @@ export class GameDataService {
     if (this.mcAnswers.length === 0 || this.currentPerson !== this.mcAnswersForPerson) {
       this.computeMultipleChoiceAnswers();
     }
-    return this.mcAnswers;
+    return this.mcAnswers.map(this.makeFullName);
   }
 
   public getDifficulty(mode: string): string {
@@ -281,18 +281,28 @@ export class GameDataService {
   // build up random wrong answers for the multiple choice format
   private computeMultipleChoiceAnswers(): void {
     // console.log('computeMCAnswers: getPerson is', this.getPerson());
-    const results = [this.makeFullName(this.getPerson())];
+    const results = [this.getPerson()];
     // 4 multiple choice answers
     while (results.length !== 4) {
       const person = this.getRandomPerson(this.people);
-      const name = this.makeFullName(person);
-      if (!results.includes(name)) {
-        results.push(name);
+      if (!this.labelPresentForGameMode(results, person)) {
+        results.push(person);
       }
     }
     this.mcAnswers = this.shuffle(results);
     // console.log('mcAnswers = ', this.mcAnswers);
     this.mcAnswersForPerson = this.currentPerson;
+  }
+
+  private labelPresentForGameMode(loaded: FirestorePeopleRecord[], person: FirestorePeopleRecord): boolean {
+    switch (this.chosenGameMode) {
+      case 'Multiple choice':
+        return loaded.map(this.makeFullName).includes(this.makeFullName(person));
+      case 'First name multiple choice':
+        return loaded.map(record => record.firstName).includes(person.firstName);
+      default:
+        return false;
+    }
   }
 
   private getRandomPerson(people: FirestorePeopleRecord[]) {
