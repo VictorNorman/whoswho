@@ -68,8 +68,10 @@ export class GameDataService {
   async getStreakInfoFromStorage() {
     await this.storage.create();
     // Get the last day of the week the daily quiz was done, from localStorage.
-    this.lastDayPlayedDailyQuiz = Number(await this.storage.get('lastDayPlayedDailyQuiz')) || -1;
-    this.streakNum = Number(await this.storage.get('streak')) || 0;
+    const ldpdq = await this.storage.get('lastDayPlayedDailyQuiz');
+    this.lastDayPlayedDailyQuiz = ldpdq !== null ? Number(ldpdq) : -1;
+    // console.log('getStreakInfoFromStorage: lastDayPlayedDQ = ', this.lastDayPlayedDailyQuiz);
+    this.streakNum = Number(await this.storage.get('streak'));  // if not in storage, then 0 -- perfect.
   }
 
   public async checkOrgAndSecretAgainstDb(org: string, secret: string): Promise<void> {
@@ -123,6 +125,7 @@ export class GameDataService {
 
             const d = res[0].timestamp.toDate();
             this.todaysDailyQuizDayOfTheWeek = d.getDay();
+            console.log('getDailyQuizFromDb: todaysDQDoTW = ', this.todaysDailyQuizDayOfTheWeek);
 
             // If we are in multiple choice mode, we need to recompute the
             // mcAnswers now.
@@ -251,25 +254,26 @@ export class GameDataService {
     }
   }
 
-  // increment streak info if the user was playing the daily quiz.
+  // increment streak info
   public incrementStreak() {
-    if (this.getGameMode() !== 'Daily Quiz') {
-      return;
-    }
-
     if (this.lastDayPlayedDailyQuiz === this.todaysDailyQuizDayOfTheWeek) {
       // player played already today, so don't update anything.
       return;
     }
-
+    // console.log((this.lastDayPlayedDailyQuiz + 1) % 7, this.todaysDailyQuizDayOfTheWeek);
     // first time playing the quiz.
     if (this.lastDayPlayedDailyQuiz === -1) {
       this.streakNum = 1;
+      // console.log('lastDayPlayedDailyQuiz is -1 so streak set to 1');
     } else if ((this.lastDayPlayedDailyQuiz + 1) % 7 === this.todaysDailyQuizDayOfTheWeek) {
       // played yesterday and now, so streak continues
       this.streakNum++;
+    } else {
+      // stream was broken to set back to 1 day in a row.
+      this.streakNum = 1;
     }
     this.lastDayPlayedDailyQuiz = this.todaysDailyQuizDayOfTheWeek;
+    // console.log('lastDPlayedDQ set to todaysDQDoTW which is ', this.todaysDailyQuizDayOfTheWeek);
     this.storage.set('lastDayPlayedDailyQuiz', this.lastDayPlayedDailyQuiz);
     this.storage.set('streak', this.streakNum);
   }
@@ -315,7 +319,5 @@ export class GameDataService {
     return arr.map(x => [Math.random(), x]).sort(([a], [b]) =>
       (a as number) - (b as number)).map(([_, x]) => x) as T[];
   }
-
-
 
 }
