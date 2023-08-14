@@ -1,8 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonRadioGroup, ModalController, ToastController } from '@ionic/angular';
-import { GameDataService } from '../services/game-data.service';
-import { QuizModalComponent } from '../quiz-modal/quiz-modal.component';
+import { GameDataService, GameMode } from '../services/game-data.service';
 
 @Component({
   selector: 'app-quiz',
@@ -30,7 +29,7 @@ export class QuizPage {
     this.guessIsCorrect = false;
     this.gameDataSvc.resetScore();
     if (this.useMCQuestions()) {
-      if (this.gameDataSvc.getGameMode() === 'First name multiple choice') {
+      if (this.gameDataSvc.getGameMode() === GameMode.firstNameMultipleChoice) {
         this.mcAnswers = this.gameDataSvc.getMultipleChoiceAnswers().map(a => a.split(' ')[0]);
         console.table(this.mcAnswers);
       } else {    // full mc or daily quiz mc.
@@ -56,7 +55,7 @@ export class QuizPage {
       this.guess = '';
       if (this.useMCQuestions()) {
         // load up some new random answers;
-        if (this.gameDataSvc.getGameMode() === 'First name multiple choice') {
+        if (this.gameDataSvc.getGameMode() === GameMode.firstNameMultipleChoice) {
           this.mcAnswers = this.gameDataSvc.getMultipleChoiceAnswers().map(a => a.split(' ')[0]);
           console.table(this.mcAnswers);
         } else {    // full mc or daily quiz mc.
@@ -95,14 +94,14 @@ export class QuizPage {
 
   public getTextPlaceHolder(): string {
     switch (this.gameDataSvc.getGameMode()) {
-      case 'First name multiple choice':
-      case 'Multiple choice':
+      case GameMode.firstNameMultipleChoice:
+      case GameMode.multipleChoice:
         return 'Not used';
-      case 'Last name only':
+      case GameMode.lastNameOnly:
         return 'Enter last name';
-      case 'First name only':
+      case GameMode.firstNameOnly:
         return 'Enter first name';
-      case 'Full name required':
+      case GameMode.fullName:
         return 'Enter full name';
       default:
         return 'unknown';

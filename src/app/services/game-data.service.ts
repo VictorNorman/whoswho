@@ -1,16 +1,21 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { BehaviorSubject } from 'rxjs';
 import { Storage } from '@ionic/storage-angular';
 
-export const GAME_MODES: string[] = [
-  'Multiple choice',
-  'First name multiple choice',
-  'First name only',
-  'Last name only',
-  'Full name required',
-  // 'Daily quiz',   // uses multiple choice
-];
+export enum GameMode {
+  multipleChoice = 'Multiple choice',
+  firstNameMultipleChoice = 'First name multiple choice',
+  firstNameOnly =  'First name only',
+  lastNameOnly = 'Last name only',
+  fullName = 'Full name required',
+  dailyQuiz = 'Daily quiz',   // uses multiple choice
+  blank = '',
+}
+
+const { dailyQuiz, blank, ...freeformGameModes } = GameMode;
+
 
 interface FirestorePeopleRecord {
   id: string;
@@ -38,7 +43,7 @@ export class GameDataService {
 
   public orgLoadedSubj: BehaviorSubject<string> = new BehaviorSubject<string>('not loaded yet');
 
-  private chosenGameMode = '';
+  private chosenGameMode: GameMode = GameMode.blank;
   /**
    * The current person being shown for the user to guess.
    */
@@ -134,21 +139,20 @@ export class GameDataService {
     });
   }
 
-  public getGameModes(): string[] {
-    return GAME_MODES;
+  public getFreeFormGameModes(): string[] {
+    return Object.values(freeformGameModes);
   }
 
-  public setGameMode(mode: string): void {
+  public setGameMode(mode: GameMode): void {
     this.chosenGameMode = mode;
   }
 
-  public getGameMode(): string {
+  public getGameMode(): GameMode {
     return this.chosenGameMode;
   }
 
   public useMCQuestions(): boolean {
-    return this.getGameMode() === 'Multiple choice' || this.getGameMode() === 'Daily quiz' ||
-      this.getGameMode() === 'First name multiple choice';
+    return [GameMode.multipleChoice, GameMode.dailyQuiz, GameMode.firstNameMultipleChoice].includes(this.getGameMode());
   }
 
   public incrScore() {
@@ -201,15 +205,15 @@ export class GameDataService {
 
   public isGuessCorrect(guess: string): boolean {
     switch (this.chosenGameMode) {
-      case 'Full name required':
-      case 'Multiple choice':
-      case 'Daily quiz':
+      case GameMode.fullName:
+      case GameMode.multipleChoice:
+      case GameMode.dailyQuiz:
         return guess.toUpperCase() === `${this.getPerson().firstName.toUpperCase()} ${this.getPerson().lastName.toUpperCase()}` ||
           guess.toUpperCase() === `${this.getPerson().nickName.toUpperCase()} ${this.getPerson().lastName.toUpperCase()}`;
-      case 'Last name only':
+      case GameMode.lastNameOnly:
         return guess.toUpperCase() === this.getPerson().lastName.toUpperCase();
-      case 'First name multiple choice':
-      case 'First name only':
+      case GameMode.firstNameMultipleChoice:
+      case GameMode.firstNameOnly:
         return guess.toUpperCase() === this.getPerson().firstName.toUpperCase() ||
           guess.toUpperCase() === this.getPerson().nickName.toUpperCase();
       default:
@@ -223,11 +227,11 @@ export class GameDataService {
 
   public getHint(): string {
     switch (this.chosenGameMode) {
-      case 'Last name only':
+      case GameMode.lastNameOnly:
         return `Last name begins with '${this.getPerson().lastName[0]}'`;
-      case 'First name only':
+      case GameMode.firstNameOnly:
         return `First name begins with '${this.getPerson().firstName[0]}'`;
-      case 'Full name required':
+      case GameMode.fullName:
         return `This person's initials are ${this.getPerson().firstName[0]}${this.getPerson().lastName[0]}`;
       default:
         return 'No hint';
@@ -242,18 +246,19 @@ export class GameDataService {
 
   public getDifficulty(mode: string): string {
     switch (mode) {
-      case 'Multiple choice': return 'Easy';
-      case 'First name multiple choice': return 'Easy';
-      case 'First name only': return 'Moderate';
-      case 'Last name only': return 'Hard';
-      case 'Full name required': return 'Very Hard';
+      case GameMode.multipleChoice:
+      case GameMode.firstNameMultipleChoice:
+        return 'Easy';
+      case GameMode.firstNameOnly: return 'Moderate';
+      case GameMode.lastNameOnly: return 'Hard';
+      case GameMode.fullName: return 'Very Hard';
       default: return 'Waaa?';
     }
   }
 
   // increment streak info if the user was playing the daily quiz.
   public incrementStreak() {
-    if (this.getGameMode() !== 'Daily Quiz') {
+    if (this.getGameMode() !== GameMode.dailyQuiz) {
       return;
     }
 
@@ -315,7 +320,4 @@ export class GameDataService {
     return arr.map(x => [Math.random(), x]).sort(([a], [b]) =>
       (a as number) - (b as number)).map(([_, x]) => x) as T[];
   }
-
-
-
 }

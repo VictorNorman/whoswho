@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component } from '@angular/core';
 import { GameDataService } from '../services/game-data.service';
 
 @Component({
@@ -7,20 +6,17 @@ import { GameDataService } from '../services/game-data.service';
   templateUrl: './choose-difficulty.page.html',
   styleUrls: ['./choose-difficulty.page.scss'],
 })
-export class ChooseDifficultyPage implements OnInit {
+export class ChooseDifficultyPage {
 
   public modeChosen = false;
 
   constructor(
     public gameDataSvc: GameDataService,
-    private router: Router,
   ) { }
 
-  ngOnInit() {
-  }
 
   public getGameModes(): string[] {
-    return this.gameDataSvc.getGameModes();
+    return this.gameDataSvc.getFreeFormGameModes();
   }
 
   public gameModeSelected(event: any): void {
