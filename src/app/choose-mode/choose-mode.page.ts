@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { GameDataService } from '../services/game-data.service';
+import { GameDataService, GameMode } from '../services/game-data.service';
 
 @Component({
   selector: 'app-choose-mode',
   templateUrl: './choose-mode.page.html',
   styleUrls: ['./choose-mode.page.scss'],
 })
-export class ChooseModePage implements OnInit {
+export class ChooseModePage {
   public modeChosen = false;
   public numPeople = 5;
   public maxPeople = 5;
@@ -19,12 +19,8 @@ export class ChooseModePage implements OnInit {
     this.maxPeople = this.gameDataSvc.getMaxPeople();
   }
 
-  ngOnInit() {
-
-  }
-
   public async dailyQuiz() {
-    this.gameDataSvc.setGameMode('Daily quiz');
+    this.gameDataSvc.setGameMode(GameMode.fullName);
     await this.gameDataSvc.getDailyQuizFromDb();
     // I have such timing problems with getting the data and
     // computing the mcanswers, so I'll delay going to the page for a bit.
@@ -32,7 +28,7 @@ export class ChooseModePage implements OnInit {
   }
 
   public getGameModes(): string[] {
-    return this.gameDataSvc.getGameModes();
+    return this.gameDataSvc.getFreeFormGameModes();
   }
 
   public gameModeSelected(event: any): void {
