@@ -1,39 +1,36 @@
 <ion-content [fullscreen]="true">
 
   <ion-list>
-    <ion-progress-bar [value]="gameDataSvc.getCurrentPerson() / gameDataSvc.getNumPersonsInQuiz()"></ion-progress-bar>
+    <ion-progress-bar [value]="gameDataSvc.currentPersonIdx$() / gameDataSvc.numPersonsInQuiz$()"></ion-progress-bar>
 
-    <!-- This spinner code didn't work well -- made the screen jump down each time.
-      <div *ngIf="imageNotLoaded" class="spinner-area">
-      <ion-spinner class="image-spinner"></ion-spinner>
-    </div> -->
-    <ion-img class="person-image" [src]="getPerson().imageData || 'assets/icons/icon-96x96.png'"></ion-img>
+    <ion-img class="person-image"
+      [src]="gameDataSvc.currentPerson$().imageData || 'assets/icons/icon-96x96.png'"></ion-img>
 
     <!-- Multiple-choice -->
-    <div *ngIf="useMCQuestions()">
-      <ion-list>
-        <ion-list-header>Who is this image bearer?</ion-list-header>
-        <ion-radio-group #radiogroup (ionChange)="choiceSelected($event)">
-          <ion-item *ngFor="let name of mcAnswers">
-            <ion-label>{{name}}</ion-label>
-            <ion-radio [value]="name"></ion-radio>
-          </ion-item>
-        </ion-radio-group>
-      </ion-list>
-    </div>
-
+    @if (gameDataSvc.gameModeUsesMCQuestions$()) {
+    <ion-list>
+      <ion-list-header>Who is this image bearer?</ion-list-header>
+      <ion-radio-group #radiogroup (ionChange)="choiceSelected($event)">
+        @for (name of mcAnswers; track $index) {
+        <ion-item>
+          <ion-label>{{name}}</ion-label>
+          <ion-radio [value]="name"></ion-radio>
+        </ion-item>
+        }
+      </ion-radio-group>
+    </ion-list>
+    }
+    @else {
     <!-- Fill-in-the-blank -->
-    <div *ngIf="!useMCQuestions()">
-      <ion-item lines="none">
-        <ion-label>Who is this?</ion-label>
-        <ion-input [placeholder]="getTextPlaceHolder()" [(ngModel)]="guess"></ion-input>
-      </ion-item>
-    </div>
+    <ion-item lines="none">
+      <ion-input label="Who is this?" [placeholder]="gameModePlaceHolderText$()" [(ngModel)]="guess"></ion-input>
+    </ion-item>
+    }
 
     <ion-row class="ion-justify-content-around">
-      <ion-button *ngIf="! useMCQuestions()" (click)="showHint()">
-        A hint, please.
-      </ion-button>
+      @if(!gameDataSvc.gameModeUsesMCQuestions$()) {
+      <ion-button (click)="showHint()"> A hint, please. </ion-button>
+      }
       <ion-button id="submit-button" [disabled]="!guess" (click)="handleSubmit()">
         That's my answer!
       </ion-button>
@@ -42,7 +39,8 @@
         <ng-template>
           <ion-content>
             <ion-text class="center-text answer-text">
-              <ion-icon class="space-after" [name]="isGuessCorrect() ? 'thumbs-up-sharp' : 'thumbs-down-sharp'"></ion-icon>
+              <ion-icon class="space-after"
+                [name]="isGuessCorrect() ? 'thumbs-up-sharp' : 'thumbs-down-sharp'"></ion-icon>
               <span>{{isGuessCorrect() ? "Correct! " : "Sorry, that's wrong. "}} This is </span>
               <div class="correct-answer center-text">
                 {{gameDataSvc.getCorrectAnswer()}}

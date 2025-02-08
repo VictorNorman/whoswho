@@ -1,8 +1,0 @@
-<ion-text class="center-text answer-text">
-  <ion-icon class="space-after" [name]="guessCorrect ? 'thumbs-up-sharp' : 'thumbs-down-sharp'"></ion-icon>
-  <span>{{guessCorrect ? "Correct! " : "Sorry, that's wrong. "}} This is </span>
-  <div class="correct-answer center-text">
-    {{correctAnswer}}
-  </div>
-</ion-text>
-<ion-button class="dismiss-button center" (click)="dismiss()">Got it!</ion-button>

@@ -1,44 +1,62 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { IonContent, IonImg, IonList, IonItem, IonLabel, IonButton, IonInput } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { GameDataService } from '../services/game-data.service';
 import { Storage } from '@ionic/storage-angular';
-import { AngularFireFunctions } from '@angular/fire/compat/functions';
 import { MessagingService } from '../services/messaging.service';
 
 @Component({
   selector: 'app-start',
   templateUrl: './start.page.html',
   styleUrls: ['./start.page.scss'],
+  standalone: true,
+  imports: [IonInput,
+    IonButton,
+    IonLabel,
+    IonItem,
+    IonList,
+    IonImg,
+    IonContent,
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+  ]
 })
-export class StartPage implements OnInit {
+export class StartPage {
 
-  public organization = '';
-  public secret = '';
   public disableSubmit = true;
 
+  gameDataSvc = inject(GameDataService);
+  router = inject(Router);
+  toastCtrl = inject(ToastController);
+  storage = inject(Storage);
+  messaging = inject(MessagingService);
+
+  formBuilder = inject(FormBuilder);
+  loginForm = this.formBuilder.group({
+    organization: [''],
+    secret: [''],
+  });
+
   constructor(
-    private gameDataSvc: GameDataService,
-    private router: Router,
-    private toastCtrl: ToastController,
-    private storage: Storage,
-    private msgSvc: MessagingService,
   ) {
-    // get the token for push notifications.
-    this.msgSvc.requestPermission();
   }
 
   async ngOnInit() {
     await this.storage.create();
-    this.organization = (await this.storage.get('organization')) || '';
-    this.secret = (await this.storage.get('secret')) || '';
+    const organization = (await this.storage.get('organization')) || '';
+    const secret = (await this.storage.get('secret')) || '';
+    this.loginForm.setValue({ organization, secret });
   }
 
   public async onSubmit() {
-    this.organization = this.organization.trim();
-    this.secret = this.secret.trim();
+    const organization = this.loginForm.get<string>('organization')?.value.trim();
+    const secret = this.loginForm.get<string>('secret')?.value.trim();
     try {
-      await this.gameDataSvc.checkOrgAndSecretAgainstDb(this.organization, this.secret);
+      await this.gameDataSvc.checkOrgAndSecretAgainstDb(organization, secret);
     } catch {
       const toast = await this.toastCtrl.create({
         message: 'Wrong organization or secret',
@@ -47,15 +65,15 @@ export class StartPage implements OnInit {
       await toast.present();
       return;
     }
-    await this.gameDataSvc.getPeopleFromDb();
+
     // good organization and secret, so save the info for next time.
     this.saveUserInfo();
     this.router.navigateByUrl('choose-mode');
   }
 
   private saveUserInfo() {
-    this.storage.set('organization', this.organization);
-    this.storage.set('secret', this.secret);
+    this.storage.set('organization', this.loginForm.get<string>('organization')!.value);
+    this.storage.set('secret', this.loginForm.get<string>('secret')!.value);
   }
 
 }

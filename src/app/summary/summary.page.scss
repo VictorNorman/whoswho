@@ -1,28 +1,28 @@
 .center {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
 .center-text {
-    margin-left: auto;
-    margin-right: auto;
-    display: table;
+  margin-left: auto;
+  margin-right: auto;
+  display: table;
 }
 
 ion-img {
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  width: 50%;
 }
 
 .stars {
-    font-size: 2.0em;
+  font-size: 2em;
 }
 
 .larger-font {
-    font-size: 18px;
+  font-size: 18px;
 }

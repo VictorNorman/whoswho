@@ -2,21 +2,21 @@
   <ion-list>
     <ion-img src="assets/logo.svg"></ion-img>
 
-    <form #loginForm="ngForm">
+    <form [formGroup]="loginForm">
       <ion-item>
         <ion-label position="stacked">Enter the name of your organization:</ion-label>
-        <ion-input placeholder="organization" [(ngModel)]="organization" name="organization" required></ion-input>
+        <ion-input placeholder="organization" formControlName="organization" name="organization" required></ion-input>
       </ion-item>
       <ion-item lines="none">
         <ion-label position="stacked">Enter the secret key for your quiz:</ion-label>
-        <ion-input placeholder="secret" [(ngModel)]="secret" name="secret" required></ion-input>
+        <ion-input placeholder="secret" formControlName="secret" name="secret" required></ion-input>
       </ion-item>
       <ion-button [disabled]="!loginForm.valid" (click)="onSubmit()">Submit</ion-button>
     </form>
     <ion-item>
     </ion-item>
     <ion-item lines="none">
-      <span class="tiny">Version 0.8.11</span>
+      <span class="tiny">Version 0.9.3</span>
     </ion-item>
 
   </ion-list>

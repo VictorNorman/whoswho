@@ -1,33 +1,33 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { IonContent, IonImg, IonItem, IonButton, IonCheckbox } from '@ionic/angular/standalone';
 import { GameDataService } from '../services/game-data.service';
+import { RouterLink } from '@angular/router';
 import { Share } from '@capacitor/share';
+
 
 @Component({
   selector: 'app-summary',
   templateUrl: './summary.page.html',
   styleUrls: ['./summary.page.scss'],
+  standalone: true,
+  imports: [IonCheckbox, IonButton, IonItem, IonImg, IonContent,
+    CommonModule, FormsModule, RouterLink]
 })
 export class SummaryPage implements OnInit {
 
-  public streak = -1;
+  public dataSvc = inject(GameDataService);
 
-  constructor(
-    public dataSvc: GameDataService,
-  ) { }
+  public streak = -1;
 
   ngOnInit() {
     this.dataSvc.incrementStreak();
     this.streak = this.dataSvc.getStreak();
   }
 
-  public redoQuiz(): void {
-    this.dataSvc.resetCurrentPerson();
-    this.dataSvc.resetScore();
-  }
-
   public restart(): void {
-    this.dataSvc.resetCurrentPerson();
-    this.dataSvc.resetScore();
+    this.dataSvc.resetQuiz$.next();
   }
 
   public genNstars(n: number) {
@@ -47,13 +47,17 @@ export class SummaryPage implements OnInit {
       await Share.share({
         title: 'Share your score',
         // eslint-disable-next-line max-len
-        text: `Image Bearers on ${todayStr}: ${this.genNstars(this.dataSvc.getScore())} on ${this.dataSvc.getDifficulty(this.dataSvc.getGameMode())} mode, and have a daily streak of ${this.dataSvc.getStreak()}!`,
+        text: `Image Bearers on ${todayStr}: ${this.genNstars(this.dataSvc.score$())} on ${this.dataSvc.getDifficulty(this.dataSvc.gameMode$())} mode, and have a daily streak of ${this.dataSvc.getStreak()}!`,
         // eslint-disable-next-line max-len
         // text: `Image Bearers on ${todayStr}: ${this.genNstars(this.dataSvc.getScore())} on ${this.dataSvc.getDifficulty(this.dataSvc.getGameMode())} mode!`,
         dialogTitle: 'Share your score',
       });
     } catch (e) {
     }
+  }
+
+  saveMissedImageBearers() {
+    this.dataSvc.saveMissedImageBearersToStorage();
   }
 
   // '🟨';

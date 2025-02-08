@@ -1,23 +1,28 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import {
+  IonContent, IonItem, IonRadioGroup, IonGrid, IonRow, IonCol, IonLabel, IonRadio, IonButton,
+} from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
-import { GameDataService } from '../services/game-data.service';
+import { GameDataService, GameMode } from '../services/game-data.service';
 
 @Component({
-  selector: 'app-choose-difficulty',
   templateUrl: './choose-difficulty.page.html',
   styleUrls: ['./choose-difficulty.page.scss'],
+  standalone: true,
+  imports: [IonButton, IonRadio, IonLabel, IonCol, IonRow, IonGrid, IonRadioGroup, IonItem, IonContent,
+    CommonModule, FormsModule,
+  ]
 })
 export class ChooseDifficultyPage implements OnInit {
+  public gameDataSvc = inject(GameDataService);
+  private router = inject(Router);
 
-  public modeChosen = false;
+  modeChosen = false;
+  constructor() { }
 
-  constructor(
-    public gameDataSvc: GameDataService,
-    private router: Router,
-  ) { }
-
-  ngOnInit() {
-  }
+  ngOnInit() { }
 
   public getGameModes(): string[] {
     return this.gameDataSvc.getGameModes();
@@ -25,7 +30,13 @@ export class ChooseDifficultyPage implements OnInit {
 
   public gameModeSelected(event: any): void {
     this.modeChosen = true;
-    this.gameDataSvc.setGameMode(event.detail.value);
+    this.gameDataSvc.gameMode$.set(event.detail.value as GameMode);
+  }
+
+
+
+  public goToQuizPage() {
+    this.router.navigate(['/quiz']);
   }
 
 }

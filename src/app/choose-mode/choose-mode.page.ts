@@ -1,58 +1,46 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameDataService } from '../services/game-data.service';
+import { FormsModule } from '@angular/forms';
+import { IonContent, IonImg, IonItem, IonRow, IonButton, IonList } from "@ionic/angular/standalone";
 
 @Component({
   selector: 'app-choose-mode',
   templateUrl: './choose-mode.page.html',
   styleUrls: ['./choose-mode.page.scss'],
+  standalone: true,
+  imports: [
+    IonList, IonButton, IonRow, IonItem, IonImg, IonContent,
+    FormsModule,
+  ]
 })
 export class ChooseModePage implements OnInit {
   public modeChosen = false;
-  public numPeople = 5;
-  public maxPeople = 5;
 
-  constructor(
-    public gameDataSvc: GameDataService,
-    private router: Router,
-  ) {
-    this.maxPeople = this.gameDataSvc.getMaxPeople();
+  public numPeople = 5;   // for custom quiz
+
+  public gameDataSvc = inject(GameDataService);
+  private router = inject(Router);
+
+  constructor() {
   }
 
   ngOnInit() {
-
+    // This is called here because once we've routed to this page, the org will have
+    // been set, which is required for getting the people from the database.
+    this.gameDataSvc.getAllPeopleFromDb();
   }
 
   public async dailyQuiz() {
-    this.gameDataSvc.setGameMode('Daily quiz');
-    await this.gameDataSvc.getDailyQuizFromDb();
-    // I have such timing problems with getting the data and
-    // computing the mcanswers, so I'll delay going to the page for a bit.
-    setTimeout(() => this.router.navigateByUrl('/choose-difficulty'), 800);
+    this.gameDataSvc.setDailyOrCustomQuiz$.next('Daily quiz');
+    this.gameDataSvc.setNumPersonsInQuiz(10);
+    this.router.navigateByUrl('/choose-difficulty');
   }
 
-  public getGameModes(): string[] {
-    return this.gameDataSvc.getGameModes();
-  }
-
-  public gameModeSelected(event: any): void {
-    this.modeChosen = true;
-    this.gameDataSvc.setGameMode(event.detail.value);
-  }
-
-  // the game mode is already saved in the function above.
   public useCustomQuiz(): void {
-    // console.log('saving # of persons = ', this.numPeople);
     this.gameDataSvc.setNumPersonsInQuiz(this.numPeople);
-    this.gameDataSvc.pickPeopleForQuiz();
-    // I have such timing problems with getting the data and
-    // computing the mcanswers, so I'll delay going to the page for a bit.
-    setTimeout(() => this.router.navigateByUrl('/choose-difficulty'), 500);
+    this.gameDataSvc.setDailyOrCustomQuiz$.next('Custom quiz');
+    this.router.navigateByUrl('/choose-difficulty');
   }
-
-  public customFormatter(value: number): string {
-    return `${value}`;
-  }
-
 
 }

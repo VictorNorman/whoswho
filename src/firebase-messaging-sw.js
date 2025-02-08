@@ -16,9 +16,9 @@ firebase.initializeApp({
 
 // Retrieve an instance of Firebase Messaging so that it can handle background
 // messages.
-messaging = firebase.messaging();
+varmessaging = firebase.messaging();
 
-self.addEventListener('notificationclick', function(event) {
+self.addEventListener('notificationclick', function (event) {
     event.waitUntil(
         clients.matchAll({
             type: 'window',

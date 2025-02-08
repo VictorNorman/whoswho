@@ -1,7 +1,13 @@
-import { Injectable } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { BehaviorSubject } from 'rxjs';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import {
+  Firestore, doc, getDoc, Timestamp, collection,
+  query, where, collectionData, orderBy, limit
+} from '@angular/fire/firestore';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { first, Observable, Subject } from 'rxjs';
 import { Storage } from '@ionic/storage-angular';
+
+
 
 export const GAME_MODES: string[] = [
   'Multiple choice',
@@ -9,8 +15,12 @@ export const GAME_MODES: string[] = [
   'First name only',
   'Last name only',
   'Full name required',
-  // 'Daily quiz',   // uses multiple choice
-];
+] as const;
+
+// Convert the array into a union type: thanks to ChatGPT.
+export type GameMode = typeof GAME_MODES[number];
+
+type DailyOrCustomQuiz = 'Daily quiz' | 'Custom quiz';
 
 interface FirestorePeopleRecord {
   id: string;
@@ -21,14 +31,20 @@ interface FirestorePeopleRecord {
   imageData: string;
 }
 
-interface FirebaseOrgRecord {
+interface FirestoreOrgRecord {
   organization: string;
   secret: string;
 }
 
-interface FirebaseDailyQuizPeople {
-  people: Array<{ doc: string }>;
-  timestamp: firebase.default.firestore.Timestamp;
+
+interface FirestoreDailyQuizPeople {
+  people: Array<string>;
+  timestamp: Timestamp;
+}
+
+interface PeopleDataState {
+  people: FirestorePeopleRecord[];
+  loading: boolean;
 }
 
 @Injectable({
@@ -36,74 +52,156 @@ interface FirebaseDailyQuizPeople {
 })
 export class GameDataService {
 
-  public orgLoadedSubj: BehaviorSubject<string> = new BehaviorSubject<string>('not loaded yet');
+  private fs = inject(Firestore);
+  private storage = inject(Storage);
 
-  private chosenGameMode = '';
-  /**
-   * The current person being shown for the user to guess.
-   */
-  private currentPerson = 1;
-  private numPersonsInQuiz = 0;
+  // state
 
-  private people: FirestorePeopleRecord[] = [];
-  private quizPeople: FirestorePeopleRecord[] = [] ;
   private org = '';
-  private mcAnswers: FirestorePeopleRecord[] = [];
-  private mcAnswersForPerson = 1;
+  private peopleState = signal<PeopleDataState>({
+    people: [],
+    loading: true,
+  });
+  // multiple choice, first name multiple choice, first name only, etc.
+  private gameModeState = signal<GameMode>('');
 
-  private score = 0;
+  private quizState = signal({
+    currentPersonIdx: 0,
+    quizPeople: [] as FirestorePeopleRecord[],
+    userAnswerIsCorrect: null as null | boolean,  // boolean when answer is given.
+    score: 0,
+    quizIsOver: false,
+    numPersonsInQuiz: 0,
+    peopleMissedIds: [] as string[],  // people who were missed in the quiz.
+  });
 
   // store this to compute how many days in a row the daily quiz has been done.
   private todaysDailyQuizDayOfTheWeek = -1;   // uninitialized
   private lastDayPlayedDailyQuiz = -1;
   private streakNum = -1;   // how many days the player has played in a row.
 
-  constructor(
-    private db: AngularFirestore,
-    private storage: Storage,
-  ) {
+  // selectors
+  // People state selectors
+  public loading$ = computed(() => this.peopleState().loading);
+  public people$ = computed(() => this.peopleState().people);
+  public maxPeople$ = computed(() => this.peopleState().people.length);
+
+  // Quiz State selectors
+  public currentPersonIdx$ = computed(() => this.quizState().currentPersonIdx);
+  public gameModeUsesMCQuestions$ = computed(() =>
+    this.gameModeState() === 'Multiple choice'
+    || this.gameModeState() === 'First name multiple choice')
+    || this.gameModeState() === 'Daily quiz';
+  public quizIsOver$ = computed(() => this.quizState().quizIsOver);
+  public score$ = computed(() => this.quizState().score);
+  public numPersonsInQuiz$ = computed(() => this.quizState().numPersonsInQuiz);
+
+  // sources
+
+  setDailyOrCustomQuiz$ = new Subject<DailyOrCustomQuiz>();
+  gameMode$ = this.gameModeState;
+  // The boolean parameter indicates if the user guessed correctly or not.
+  goToNextPerson$ = new Subject<boolean>();
+  isUsersAnswerCorrect$ = new Subject<string>();
+  currentPerson$ = computed(() => this.quizState().quizPeople[this.currentPersonIdx$()]);
+  resetQuiz$ = new Subject<void>();
+
+  // ids of people we have missed in previous quizzes
+  peopleMissedPreviously: string[] = [];
+
+  constructor() {
+
     this.getStreakInfoFromStorage();
+    this.getMissedPeopleListFromStorage();
+
+    // reducers
+
+    this.setDailyOrCustomQuiz$.pipe(takeUntilDestroyed())
+      .subscribe((mode: GameMode) => {
+        if (mode === 'Daily quiz') {
+          this.getDailyQuizFromDb();
+        } else if (mode === 'Custom quiz') {
+          this.pickPeopleForCustomQuiz();
+        }
+      });
+
+    this.goToNextPerson$.pipe(takeUntilDestroyed())
+      .subscribe((wasCorrectGuess) => {
+        this.quizState.update((currState) => {
+          return {
+            ...currState,
+            currentPersonIdx: currState.currentPersonIdx < currState.quizPeople.length - 1 ?
+              currState.currentPersonIdx + 1 :
+              currState.currentPersonIdx,
+            userAnswerIsCorrect: null,
+            score: wasCorrectGuess ? currState.score + 1 : currState.score,
+            quizIsOver: currState.currentPersonIdx === currState.quizPeople.length - 1,
+            peopleMissedIds: wasCorrectGuess ? currState.peopleMissedIds : [
+              ...currState.peopleMissedIds,
+              currState.quizPeople[currState.currentPersonIdx].id,
+            ],
+          }
+        });
+      });
+
+    this.isUsersAnswerCorrect$.pipe(takeUntilDestroyed())
+      .subscribe((guess: string) => {
+        this.quizState.update((currState) => ({
+          ...currState,
+          userAnswerIsCorrect: this.isGuessCorrect(guess),
+        }));
+      });
+
+    this.resetQuiz$.pipe(takeUntilDestroyed())
+      .subscribe(() => {
+        this.quizState.update((currState) => ({
+          ...currState,
+          currentPersonIdx: 0,
+          userAnswerIsCorrect: null,
+          score: 0,
+          quizIsOver: false,
+        }));
+      });
+
   }
 
-  async getStreakInfoFromStorage() {
-    await this.storage.create();
-    // Get the last day of the week the daily quiz was done, from localStorage.
-    const ldpdq = await this.storage.get('lastDayPlayedDailyQuiz');
-    this.lastDayPlayedDailyQuiz = ldpdq !== null ? Number(ldpdq) : -1;
-    // console.log('getStreakInfoFromStorage: lastDayPlayedDQ = ', this.lastDayPlayedDailyQuiz);
-    this.streakNum = Number(await this.storage.get('streak'));  // if not in storage, then 0 -- perfect.
-  }
-
+  /**
+   * @param org organization name from login screen
+   * @param secret secret "password" from login screen
+   * @returns Promise<void>: resolved if org and secret are valid, rejected otherwise
+   */
   public async checkOrgAndSecretAgainstDb(org: string, secret: string): Promise<void> {
     this.org = '';
     return new Promise<void>(async (resolve, reject) => {
-      const doc = await this.db.collection<FirebaseOrgRecord>('organization').doc(org).get().toPromise();
-      if (doc) {
-        const docData = doc.data();
-        if (!docData || docData.secret !== secret) {
-          reject();
-        } else {
-          this.org = org;
-          resolve();
-        }
+      const docRef = doc(this.fs, `organization/${org}`);
+      const orgRec = (await getDoc(docRef)).data() as FirestoreOrgRecord;
+      if (!orgRec || orgRec.secret !== secret) {
+        reject();
+      } else {
+        this.org = org;
+        resolve();
       }
     });
   }
 
-  public async getPeopleFromDb() {
-    return new Promise<void>((resolve, reject) => {
-      this.currentPerson = 1;
-      this.people = [];
-      this.quizPeople = [];
-      this.db.collection<FirestorePeopleRecord>('people',
-        ref => ref.where('belongsTo', '==', this.org)).valueChanges({ idField: 'id' }).subscribe(
-          people => {
-            if (people) {
-              this.people = people;
-              resolve();
-            }
-          }
-        );
+  public async getAllPeopleFromDb() {
+    // TODO: probably better way to do this. And/or complete this code.
+    this.quizState.update((currState) => ({
+      ...currState,
+      currentPersonIdx: 0,
+      quizPeople: [],
+    }));
+    const collRef = collection(this.fs, 'people');
+    const q = query(collRef, where('belongsTo', '==', this.org));
+    const data = collectionData(q, { idField: 'id' }) as Observable<FirestorePeopleRecord[]>;
+    data.pipe(
+      first()
+    ).subscribe((people) => {
+      this.peopleState.update((currState) => ({
+        ...currState,
+        people: people,
+        loading: false,
+      }));
     });
   }
 
@@ -111,136 +209,124 @@ export class GameDataService {
    * set quizPeople to the list of people from the latest dailies entry in the database.
    */
   public getDailyQuizFromDb(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve) => {
 
-      this.db.collection<FirebaseDailyQuizPeople>(`organization/${this.org}/dailies`,
-        ref => ref.orderBy('timestamp', 'desc').limit(1)).valueChanges().subscribe(
-          res => {
-            // We have all the people already, so we can use the ids to just
-            // reference the entries in people...  TODO: probably want to not
-            // pull all people each time.
-            this.quizPeople = res[0].people.map(personId =>
-              this.people.find((p) => p.id === personId.doc)) as FirestorePeopleRecord[];
-            this.numPersonsInQuiz = this.quizPeople.length;
+      const collRef = collection(this.fs, `organization/${this.org}/dailies`);
+      const q = query(collRef, orderBy('timestamp', 'desc'), limit(1));
+      const data = collectionData(q) as Observable<FirestoreDailyQuizPeople[]>;
+      data.pipe(first())
+        .subscribe((res) => {
+          // We have all the people already, so we can use the ids to just
+          // reference the entries in people the people array.
+          this.quizState.update((currState) => ({
+            ...currState,
+            currentPersonIdx: 0,
+            quizPeople: res[0].people
+              .map(personId => this.people$()
+                .find((p) => p.id === personId)) as FirestorePeopleRecord[],
+          }));
 
-            const d = res[0].timestamp.toDate();
-            this.todaysDailyQuizDayOfTheWeek = d.getDay();
-            console.log('getDailyQuizFromDb: todaysDQDoTW = ', this.todaysDailyQuizDayOfTheWeek);
-
-            // If we are in multiple choice mode, we need to recompute the
-            // mcAnswers now.
-            if (this.useMCQuestions()) {
-              this.computeMultipleChoiceAnswers();
-            }
-            resolve();
-          });
+          const d = res[0].timestamp.toDate();
+          this.todaysDailyQuizDayOfTheWeek = d.getDay();
+          resolve();
+        });
     });
+  }
+
+  public pickPeopleForCustomQuiz(): void {
+    this.quizState.update((currState) => ({
+      ...currState,
+      currentPersonIdx: 0,
+      quizPeople: this.pickNRandomPeople(),
+    }));
+  }
+
+  public getMultipleChoiceAnswers(): string[] {
+    const answers = this.computeMultipleChoiceAnswers();
+    if (this.gameMode$() === 'First name multiple choice') {
+      return answers.map(a => a.firstName);
+    } else {
+      return answers.map(this.makeFullName);
+    }
+  }
+
+  // build up random wrong answers for the multiple choice format
+  private computeMultipleChoiceAnswers(): FirestorePeopleRecord[] {
+    const results = [this.currentPerson$()];
+    // 4 multiple choice answers total.
+    while (results.length !== 4) {
+      const person = this.getRandomPerson();
+      if (!this.labelPresentForGameMode(results, person)) {
+        results.push(person);
+      }
+    }
+    return this.shuffle(results);;
+  }
+
+  /**
+   * Check if the given person's full name (or first name for 'First name multiple choice')
+   * is in the list of loaded people. If so, return true.
+   * @param loaded the list of people to check against
+   * @param person the person to check if they are in the list
+   * @returns true if the person is in the list, false otherwise
+   */
+  private labelPresentForGameMode(loaded: FirestorePeopleRecord[], person: FirestorePeopleRecord): boolean {
+    switch (this.gameMode$()) {
+      case 'Multiple choice':
+        return loaded.map(this.makeFullName).includes(this.makeFullName(person));
+      case 'First name multiple choice':
+        return loaded.map(record => record.firstName).includes(person.firstName);
+      default:
+        return false;
+    }
+  }
+
+  private getRandomPerson() {
+    return this.people$()[Math.floor(Math.random() * this.people$().length)];
+  }
+
+  /**
+   * Pick N random people when the user selects the "custom quiz".
+   * @returns the next person in the quizPeople array.
+   */
+  private pickNRandomPeople(): FirestorePeopleRecord[] {
+    // create a quiz from N random people in the people array.
+    const shuffled = this.shuffle(this.people$());
+    return shuffled.slice(0, this.numPersonsInQuiz$());
   }
 
   public getGameModes(): string[] {
     return GAME_MODES;
   }
 
-  public setGameMode(mode: string): void {
-    this.chosenGameMode = mode;
-  }
-
-  public getGameMode(): string {
-    return this.chosenGameMode;
-  }
-
-  public useMCQuestions(): boolean {
-    return this.getGameMode() === 'Multiple choice' || this.getGameMode() === 'Daily quiz' ||
-      this.getGameMode() === 'First name multiple choice';
-  }
-
-  public incrScore() {
-    this.score++;
-  }
-  public getScore() {
-    return this.score;
-  }
-  public resetScore() {
-    this.score = 0;
-  }
-
-  public getCurrentPerson(): number {
-    return this.currentPerson;
-  }
-
-  public resetCurrentPerson(): void {
-    this.currentPerson = 1;
-  }
-
-  public goToNextPerson(): void {
-    if (!this.isEndOfQuiz()) {
-      this.currentPerson++;
-    }
-  }
-
-  public isEndOfQuiz(): boolean {
-    return this.currentPerson === this.numPersonsInQuiz;
-  }
-
-  public getNumPersonsInQuiz(): number {
-    return this.numPersonsInQuiz;
-  }
-
-  public getMaxPeople(): number {
-    return this.people.length;
-  }
-
   public setNumPersonsInQuiz(np: number): void {
-    this.numPersonsInQuiz = np;
-  }
-
-  public pickPeopleForQuiz(): void {
-    this.quizPeople = this.pickNRandomPeople();
-  }
-
-  public getPerson(): FirestorePeopleRecord {
-    return this.quizPeople[this.getCurrentPerson() - 1];
+    this.quizState.update((currState) => ({
+      ...currState,
+      numPersonsInQuiz: np,
+    }));
   }
 
   public isGuessCorrect(guess: string): boolean {
-    switch (this.chosenGameMode) {
+    const person = this.currentPerson$();
+    switch (this.gameMode$()) {
       case 'Full name required':
       case 'Multiple choice':
       case 'Daily quiz':
-        return guess.toUpperCase() === `${this.getPerson().firstName.toUpperCase()} ${this.getPerson().lastName.toUpperCase()}` ||
-          guess.toUpperCase() === `${this.getPerson().nickName.toUpperCase()} ${this.getPerson().lastName.toUpperCase()}`;
+        return guess.toUpperCase() === `${person.firstName.toUpperCase()} ${person.lastName.toUpperCase()}` ||
+          guess.toUpperCase() === `${person.nickName.toUpperCase()} ${person.lastName.toUpperCase()}`;
       case 'Last name only':
-        return guess.toUpperCase() === this.getPerson().lastName.toUpperCase();
+        return guess.toUpperCase() === person.lastName.toUpperCase();
       case 'First name multiple choice':
       case 'First name only':
-        return guess.toUpperCase() === this.getPerson().firstName.toUpperCase() ||
-          guess.toUpperCase() === this.getPerson().nickName.toUpperCase();
+        return guess.toUpperCase() === person.firstName.toUpperCase() ||
+          guess.toUpperCase() === person.nickName.toUpperCase();
       default:
         return false;
     }
   }
 
   public getCorrectAnswer(): string {
-    return `${this.getPerson().firstName} ${this.getPerson().lastName}`;
-  }
-
-  public getHint(): string {
-    switch (this.chosenGameMode) {
-      case 'Last name only':
-        return `Last name begins with '${this.getPerson().lastName[0]}'`;
-      case 'First name only':
-        return `First name begins with '${this.getPerson().firstName[0]}'`;
-      case 'Full name required':
-        return `This person's initials are ${this.getPerson().firstName[0]}${this.getPerson().lastName[0]}`;
-      default:
-        return 'No hint';
-    }
-  }
-  public getMultipleChoiceAnswers(): string[] {
-    if (this.mcAnswers.length === 0 || this.currentPerson !== this.mcAnswersForPerson) {
-      this.computeMultipleChoiceAnswers();
-    }
-    return this.mcAnswers.map(this.makeFullName);
+    return `${this.currentPerson$().firstName} ${this.currentPerson$().lastName}`;
   }
 
   public getDifficulty(mode: string): string {
@@ -253,6 +339,20 @@ export class GameDataService {
       default: return 'Waaa?';
     }
   }
+
+  public getHint(): string {
+    switch (this.gameMode$()) {
+      case 'Last name only':
+        return `Last name begins with '${this.currentPerson$().lastName[0]}'`;
+      case 'First name only':
+        return `First name begins with '${this.currentPerson$().firstName[0]}'`;
+      case 'Full name required':
+        return `This person's initials are ${this.currentPerson$().firstName[0]}${this.currentPerson$().lastName[0]}`;
+      default:
+        return 'No hint';
+    }
+  }
+
 
   // increment streak info
   public incrementStreak() {
@@ -282,52 +382,55 @@ export class GameDataService {
     return this.streakNum;
   }
 
-  // build up random wrong answers for the multiple choice format
-  private computeMultipleChoiceAnswers(): void {
-    // console.log('computeMCAnswers: getPerson is', this.getPerson());
-    const results = [this.getPerson()];
-    // 4 multiple choice answers
-    while (results.length !== 4) {
-      const person = this.getRandomPerson(this.people);
-      if (!this.labelPresentForGameMode(results, person)) {
-        results.push(person);
-      }
-    }
-    this.mcAnswers = this.shuffle(results);
-    // console.log('mcAnswers = ', this.mcAnswers);
-    this.mcAnswersForPerson = this.currentPerson;
-  }
-
-  private labelPresentForGameMode(loaded: FirestorePeopleRecord[], person: FirestorePeopleRecord): boolean {
-    switch (this.chosenGameMode) {
-      case 'Multiple choice':
-        return loaded.map(this.makeFullName).includes(this.makeFullName(person));
-      case 'First name multiple choice':
-        return loaded.map(record => record.firstName).includes(person.firstName);
-      default:
-        return false;
-    }
-  }
-
-  private getRandomPerson(people: FirestorePeopleRecord[]) {
-    return people[Math.floor(Math.random() * people.length)];
+  // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+  private shuffle<T>(arr: Array<T>): Array<T> {
+    return arr.map(x => [Math.random(), x]).sort(([a], [b]) =>
+      (a as number) - (b as number)).map(([_, x]) => x) as T[];
   }
 
   private makeFullName(person: FirestorePeopleRecord): string {
     return `${person.firstName} ${person.lastName}`;
   }
 
-  private pickNRandomPeople(): FirestorePeopleRecord[] {
-    // create a quiz from N random people in the people array.
-    const shuffled = this.shuffle(this.people);
-    return shuffled.slice(0, this.numPersonsInQuiz);
-    // console.log('pick random peopl = ', JSON.stringify(this.quizPeople, null, 2));
+  private async getStreakInfoFromStorage() {
+    await this.storage.create();
+    // Get the last day of the week the daily quiz was done, from localStorage.
+    const ldpdq = await this.storage.get('lastDayPlayedDailyQuiz');
+    this.lastDayPlayedDailyQuiz = ldpdq !== null ? Number(ldpdq) : -1;
+    // console.log('getStreakInfoFromStorage: lastDayPlayedDQ = ', this.lastDayPlayedDailyQuiz);
+    this.streakNum = Number(await this.storage.get('streak'));  // if not in storage, then 0 -- perfect.
   }
 
-  // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-  private shuffle<T>(arr: Array<T>): Array<T> {
-    return arr.map(x => [Math.random(), x]).sort(([a], [b]) =>
-      (a as number) - (b as number)).map(([_, x]) => x) as T[];
+  private async getMissedPeopleListFromStorage() {
+    await this.storage.create();
+    const missedPeople = await this.storage.get('missedPeople');
+    this.peopleMissedPreviously = missedPeople || [];
+    console.log("missedPeoplePreviously: ", this.peopleMissedPreviously);
+  }
+
+
+  // add the people who were missed in the quiz to the local storage.
+  saveMissedImageBearersToStorage() {
+    // console.log('saveMissedImageBearers');
+    // Add people to were not previously missed into the total list of people missed.
+    this.quizState().peopleMissedIds.forEach(p => {
+      if (!this.peopleMissedPreviously.find(m => m === p)) {
+        this.peopleMissedPreviously.push(p);
+      }
+    });
+
+    // Remove people who were gotten right from the list of people missed.
+    this.peopleMissedPreviously =
+      this.peopleMissedPreviously
+        .filter(p =>
+          !(
+            // this previously missed person is in the quizPeople array
+            this.quizState().quizPeople.find(qp => qp.id === p) &&
+            // and the person was NOT missed in the quiz.
+            !this.quizState().peopleMissedIds.includes(p)
+          ));
+
+    this.storage.set('missedPeople', this.peopleMissedPreviously);
   }
 
 }

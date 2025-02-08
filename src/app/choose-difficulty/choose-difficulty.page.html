@@ -1,20 +1,22 @@
 <ion-content>
   <ion-item lines="none"> <b>Choose quiz difficulty:</b></ion-item>
   <ion-radio-group (ionChange)="gameModeSelected($event)">
-    <ion-item *ngFor="let mode of getGameModes()" lines="none">
+    @for (mode of getGameModes(); track $index) {
+    <ion-item lines="none">
       <ion-grid>
         <ion-row class="ion-justify-content-between">
           <ion-col>
-          <ion-label>{{mode}}</ion-label>
-          <ion-label>({{gameDataSvc.getDifficulty(mode)}})</ion-label>
+            <ion-label>{{mode}}</ion-label>
+            <ion-label>({{gameDataSvc.getDifficulty(mode)}})</ion-label>
           </ion-col>
           <ion-radio [value]="mode"></ion-radio>
         </ion-row>
       </ion-grid>
     </ion-item>
+    }
   </ion-radio-group>
   <ion-row class="ion-justify-content-around">
-    <ion-button class="center" [disabled]="!modeChosen" routerLink="/quiz" routerDirection="forward">
+    <ion-button class="center" [disabled]="!modeChosen" (click)="goToQuizPage()">
       Let's play!
     </ion-button>
   </ion-row>

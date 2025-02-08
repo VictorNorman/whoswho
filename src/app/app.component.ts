@@ -1,26 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { SwUpdate } from '@angular/service-worker';
-import { Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  styleUrls: ['app.component.scss'],
+  imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent {
-  constructor(
-    private swUpdate: SwUpdate,
-    private platform: Platform)
-  {
+
+  private swUpdate = inject(SwUpdate);
+
+
+  constructor() {
     this.checkForUpdates();
-    platform.ready().then(async () => {
-    });
   }
 
   async checkForUpdates(): Promise<void> {
-
     if (await this.swUpdate.checkForUpdate()) {
-      console.log('checkforUpdate returned true!');
       if (confirm('A new version is available. Load it?')) {
         try {
           await this.swUpdate.activateUpdate();
@@ -33,8 +30,6 @@ export class AppComponent {
     } else {
       console.log('no new version found');
     }
-
-
   }
 
 }

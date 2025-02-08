@@ -1,24 +1,32 @@
-
 <ion-content>
 
   <ion-img src="assets/logo.svg"></ion-img>
-  <h3 class="center">You got {{dataSvc.getScore()}} out of {{dataSvc.getNumPersonsInQuiz()}} right</h3>
-  <h3 class="center">on {{dataSvc.getDifficulty(dataSvc.getGameMode())}} mode!</h3>
+  <h3 class="center">You got {{dataSvc.score$()}} out of {{dataSvc.numPersonsInQuiz$()}} correct</h3>
+  <h3 class="center">on {{dataSvc.getDifficulty(dataSvc.gameMode$())}} mode!</h3>
   <ion-item lines="none" class="center-text stars">
-    {{genNstars(dataSvc.getScore())}}
+    {{genNstars(dataSvc.score$())}}
   </ion-item>
   <ion-item lines="none" class="center-text">
     <ion-button (click)="shareResults()">Share</ion-button>
   </ion-item>
-  <ion-item lines="none" class="center-text larger-font" *ngIf="streak > 1">
+
+  <!-- <ion-item lines="none">
+    Add the Image Bearers that you missed to a list to practice with later?
+    <ion-button (click)="saveMissedImageBearers()">Add</ion-button>
+  </ion-item> -->
+
+
+  @if (streak > 1) {
+  <ion-item lines="none" class="center-text larger-font">
     You have played the Daily Quiz {{streak}} days in a row! Good job!
   </ion-item>
+  }
 
-  <ion-router-link class="center" (click)="redoQuiz()" routerLink="/quiz">
+  <a class="center" (click)="restart()" routerLink="/quiz">
     <h4>Try again with the same group?</h4>
-  </ion-router-link>
-  <ion-router-link class="center" (click)="restart()" routerLink="/choose-mode">
+  </a>
+  <a class="center" (click)="restart()" routerLink="/choose-mode">
     <h4>Start again with a new group</h4>
-  </ion-router-link>
+  </a>
 
 </ion-content>
