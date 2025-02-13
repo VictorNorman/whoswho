@@ -12,7 +12,6 @@ import { importProvidersFrom, isDevMode } from '@angular/core';
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { provideServiceWorker } from '@angular/service-worker';
 import * as Sentry from '@sentry/angular';
-import { BrowserTracing } from '@sentry/tracing';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -40,17 +39,12 @@ bootstrapApplication(AppComponent, {
   ],
 });
 
-// Sentry.init({
-//   dsn: 'https://3dfb47cf7d2049aabc6dbf46ea5711db@o1158351.ingest.sentry.io/6642050',
-//   integrations: [
-//     new BrowserTracing({
-//       tracingOrigins: ['localhost', 'https://yourserver.io/api'],
-//       routingInstrumentation: Sentry.routingInstrumentation,
-//     }),
-//   ],
+Sentry.init({
+  dsn: 'https://3dfb47cf7d2049aabc6dbf46ea5711db@o1158351.ingest.sentry.io/6642050',
+  integrations: [Sentry.browserTracingIntegration()],
 
-//   // Set tracesSampleRate to 1.0 to capture 100%
-//   // of transactions for performance monitoring.
-//   // We recommend adjusting this value in production
-//   tracesSampleRate: 1.0,
-// });
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+});

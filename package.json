@@ -31,7 +31,7 @@
     "@capacitor/status-bar": "6.0.2",
     "@ionic/angular": "^8.0.0",
     "@ionic/storage-angular": "^4.0.0",
-    "@sentry/angular": "^8.53.0",
+    "@sentry/angular": "^9.1.0",
     "@sentry/tracing": "^7.120.3",
     "ionicons": "^7.0.0",
     "rxjs": "~7.8.0",
