@@ -3,16 +3,9 @@
   <ion-radio-group (ionChange)="gameModeSelected($event)">
     @for (mode of getGameModes(); track $index) {
     <ion-item lines="none">
-      <ion-grid>
-        <ion-row class="ion-justify-content-between">
-          <ion-col>
-            <ion-label>{{mode}}</ion-label>
-            <ion-label>({{gameDataSvc.getDifficulty(mode)}})</ion-label>
-          </ion-col>
-          <ion-radio [value]="mode"></ion-radio>
-        </ion-row>
-      </ion-grid>
+      <ion-radio [value]="mode">{{mode}} ({{gameDataSvc.getDifficulty(mode)}})</ion-radio>
     </ion-item>
+
     }
   </ion-radio-group>
   <ion-row class="ion-justify-content-around">

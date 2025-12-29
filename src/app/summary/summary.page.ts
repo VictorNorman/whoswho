@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonImg, IonItem, IonButton, IonCheckbox } from '@ionic/angular/standalone';
+import { IonContent, IonImg, IonItem, IonButton } from '@ionic/angular/standalone';
 import { GameDataService } from '../services/game-data.service';
 import { RouterLink } from '@angular/router';
 import { Share } from '@capacitor/share';
@@ -12,7 +12,7 @@ import { Share } from '@capacitor/share';
   templateUrl: './summary.page.html',
   styleUrls: ['./summary.page.scss'],
   standalone: true,
-  imports: [IonCheckbox, IonButton, IonItem, IonImg, IonContent,
+  imports: [IonButton, IonItem, IonImg, IonContent,
     CommonModule, FormsModule, RouterLink]
 })
 export class SummaryPage implements OnInit {

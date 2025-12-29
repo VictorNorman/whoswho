@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { ModalController, IonListHeader, IonLabel } from '@ionic/angular/standalone';
+import { ModalController, IonListHeader } from '@ionic/angular/standalone';
 import { GameDataService } from '../services/game-data.service';
 import {
   IonContent, IonImg, IonItem, IonRow, IonButton, IonList, IonModal,
@@ -16,7 +16,7 @@ import { thumbsDownSharp, thumbsUpSharp } from 'ionicons/icons';
   templateUrl: 'quiz.page.html',
   styleUrls: ['quiz.page.scss'],
   standalone: true,
-  imports: [IonLabel, IonListHeader,
+  imports: [IonListHeader,
     IonRow, IonList, IonItem,
     IonContent, IonProgressBar,
     IonImg, IonInput, IonButton,

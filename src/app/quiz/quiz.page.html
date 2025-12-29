@@ -13,8 +13,7 @@
       <ion-radio-group #radiogroup (ionChange)="choiceSelected($event)">
         @for (name of mcAnswers; track $index) {
         <ion-item>
-          <ion-label>{{name}}</ion-label>
-          <ion-radio [value]="name"></ion-radio>
+          <ion-radio [value]="name">{{name}}</ion-radio>
         </ion-item>
         }
       </ion-radio-group>
@@ -37,21 +36,18 @@
 
       <ion-modal trigger="submit-button">
         <ng-template>
-          <ion-content>
-            <ion-text class="center-text answer-text">
-              <ion-icon class="space-after"
-                [name]="isGuessCorrect() ? 'thumbs-up-sharp' : 'thumbs-down-sharp'"></ion-icon>
-              <span>{{isGuessCorrect() ? "Correct! " : "Sorry, that's wrong. "}} This is </span>
-              <div class="correct-answer center-text">
-                {{gameDataSvc.getCorrectAnswer()}}
-              </div>
-            </ion-text>
-            <ion-button class="dismiss-button center" (click)="dismiss()">Got it!</ion-button>
-          </ion-content>
+          <ion-text class="center-text answer-text">
+            <ion-icon class="space-after"
+              [name]="isGuessCorrect() ? 'thumbs-up-sharp' : 'thumbs-down-sharp'"></ion-icon>
+            <span>{{isGuessCorrect() ? "Correct! " : "Sorry, that's wrong. "}} This is </span>
+            <div class="correct-answer center-text">
+              {{gameDataSvc.getCorrectAnswer()}}
+            </div>
+          </ion-text>
+          <ion-button class="dismiss-button center" (click)="dismiss()">Got it!</ion-button>
         </ng-template>
       </ion-modal>
     </ion-row>
 
   </ion-list>
-
 </ion-content>

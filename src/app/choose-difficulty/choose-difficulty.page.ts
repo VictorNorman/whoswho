@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  IonContent, IonItem, IonRadioGroup, IonGrid, IonRow, IonCol, IonLabel, IonRadio, IonButton,
+  IonContent, IonItem, IonRadioGroup, IonRow, IonRadio, IonButton,
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { GameDataService, GameMode } from '../services/game-data.service';
@@ -11,7 +11,7 @@ import { GameDataService, GameMode } from '../services/game-data.service';
   templateUrl: './choose-difficulty.page.html',
   styleUrls: ['./choose-difficulty.page.scss'],
   standalone: true,
-  imports: [IonButton, IonRadio, IonLabel, IonCol, IonRow, IonGrid, IonRadioGroup, IonItem, IonContent,
+  imports: [IonButton, IonRadio, IonRow, IonRadioGroup, IonItem, IonContent,
     CommonModule, FormsModule,
   ]
 })

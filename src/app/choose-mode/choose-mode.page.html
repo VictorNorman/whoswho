@@ -22,7 +22,9 @@
       <input class="center" type="number" id="quantity" name="quantity" value="5" min="5"
         max="{{gameDataSvc.maxPeople$()}}" step="5" [(ngModel)]="numPeople">
     </ion-item>
-    (Total number of image bearers in the database: {{gameDataSvc.maxPeople$()}})
+    <ion-item lines="none">
+      (Total number of image bearers in the database: {{gameDataSvc.maxPeople$()}})
+    </ion-item>
     <ion-row class="ion-justify-content-around">
       <ion-button class="center" (click)="useCustomQuiz()">Custom Quiz</ion-button>
     </ion-row>
