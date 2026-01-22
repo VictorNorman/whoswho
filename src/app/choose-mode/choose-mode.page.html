@@ -22,11 +22,19 @@
       <input class="center" type="number" id="quantity" name="quantity" value="5" min="5"
         max="{{gameDataSvc.maxPeople$()}}" step="5" [(ngModel)]="numPeople">
     </ion-item>
-    <ion-item lines="none">
+    <ion-item lines="none" class="center-text">
       (Total number of image bearers in the database: {{gameDataSvc.maxPeople$()}})
     </ion-item>
     <ion-row class="ion-justify-content-around">
       <ion-button class="center" (click)="useCustomQuiz()">Custom Quiz</ion-button>
     </ion-row>
+    @if (! messaging.registeredForNotifs()) {
+    <ion-row class="register-for-notifs ion-justify-content-around">
+      Click 'Yes' to receive daily notifications reminding you to do the daily quiz.
+      <ion-button class="center" (click)="messaging.registerToReceiveNotifs()">
+        Yes
+      </ion-button>
+    </ion-row>
+    }
   </ion-list>
 </ion-content>

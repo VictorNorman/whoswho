@@ -4,7 +4,7 @@ const config: CapacitorConfig = {
   appId: 'io.ionic.starter',
   appName: 'whoswho',
   webDir: 'www',
-  bundledWebRuntime: false
+
 };
 
 export default config;

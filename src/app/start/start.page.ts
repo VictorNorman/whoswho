@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { IonContent, IonImg, IonList, IonItem, IonLabel, IonButton, IonInput } from '@ionic/angular/standalone';
+import { IonContent, IonImg, IonList, IonItem, IonLabel, IonButton, IonInput, Platform } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { GameDataService } from '../services/game-data.service';
@@ -45,6 +45,12 @@ export class StartPage {
   ) {
   }
 
+  private plat = inject(Platform);
+
+  isIOs(): boolean {
+    return this.plat.is('ios');
+  }
+
   async ngOnInit() {
     await this.storage.create();
     const organization = (await this.storage.get('organization')) || '';
@@ -75,5 +81,6 @@ export class StartPage {
     this.storage.set('organization', this.loginForm.get<string>('organization')!.value);
     this.storage.set('secret', this.loginForm.get<string>('secret')!.value);
   }
+
 
 }
