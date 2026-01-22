@@ -18,6 +18,18 @@ firebase.initializeApp({
 // messages.
 varmessaging = firebase.messaging();
 
+// From AI result of 'iphone angular pwa not receiving firebase cloud message'
+self.addEventListener('push', function (event) {
+    const payload = event.data.json();
+    const notificationTitle = payload.notification.title;
+    const notificationOptions = {
+        body: payload.notification.body,
+    };
+    // Display the notification immediately
+    event.waitUntil(self.registration.showNotification(notificationTitle, notificationOptions));
+});
+
+
 self.addEventListener('notificationclick', function (event) {
     event.waitUntil(
         clients.matchAll({

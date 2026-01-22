@@ -405,7 +405,7 @@ export class GameDataService {
     await this.storage.create();
     const missedPeople = await this.storage.get('missedPeople');
     this.peopleMissedPreviously = missedPeople || [];
-    console.log("missedPeoplePreviously: ", this.peopleMissedPreviously);
+    // console.log("missedPeoplePreviously: ", this.peopleMissedPreviously);
   }
 
 

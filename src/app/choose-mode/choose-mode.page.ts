@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { GameDataService } from '../services/game-data.service';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonImg, IonItem, IonRow, IonButton, IonList } from "@ionic/angular/standalone";
+import { MessagingService } from '../services/messaging.service';
 
 @Component({
   selector: 'app-choose-mode',
@@ -21,6 +22,7 @@ export class ChooseModePage implements OnInit {
 
   public gameDataSvc = inject(GameDataService);
   private router = inject(Router);
+  protected messaging = inject(MessagingService);
 
   constructor() {
   }
