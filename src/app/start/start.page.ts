@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { IonContent, IonImg, IonList, IonItem, IonLabel, IonButton, IonInput, Platform } from '@ionic/angular/standalone';
+import { IonContent, IonImg, IonList, IonItem, IonLabel, IonButton, IonInput } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { GameDataService } from '../services/game-data.service';
