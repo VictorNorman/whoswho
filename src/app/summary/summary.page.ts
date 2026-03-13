@@ -1,10 +1,11 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonImg, IonItem, IonButton } from '@ionic/angular/standalone';
+import { IonContent, IonImg, IonItem, IonButton, IonToggle, ToggleCustomEvent } from '@ionic/angular/standalone';
 import { GameDataService } from '../services/game-data.service';
 import { RouterLink } from '@angular/router';
 import { Share } from '@capacitor/share';
+import { MessagingService } from '../services/messaging.service';
 
 
 @Component({
@@ -12,18 +13,35 @@ import { Share } from '@capacitor/share';
   templateUrl: './summary.page.html',
   styleUrls: ['./summary.page.scss'],
   standalone: true,
-  imports: [IonButton, IonItem, IonImg, IonContent,
+  imports: [IonToggle, IonButton, IonItem, IonImg, IonContent,
     CommonModule, FormsModule, RouterLink]
 })
 export class SummaryPage implements OnInit {
 
   public dataSvc = inject(GameDataService);
+  public mesgSvc = inject(MessagingService);
 
   public streak = -1;
 
-  ngOnInit() {
+  public userHasChosenNotifsPreviously: boolean = true;
+  protected toggleReceiveNotifsOn = signal<boolean>(true);
+
+  async ngOnInit() {
     this.dataSvc.incrementStreak();
     this.streak = this.dataSvc.getStreak();
+    this.userHasChosenNotifsPreviously = await this.mesgSvc.userHasStoredReceiveNotifsPref();
+
+    if (!this.userHasChosenNotifsPreviously) {
+      // if user has not chosen previously, assume they want notifs... :-)
+      this.toggleReceiveNotifsOn.set(true);
+      this.mesgSvc.registerToReceiveNotifs();
+    } else {
+      const userPref = await this.mesgSvc.getReceiveNotifsPref();
+      if (userPref) {
+        this.mesgSvc.registerToReceiveNotifs();
+      }
+      this.toggleReceiveNotifsOn.set(userPref);
+    }
   }
 
   public restart(): void {
@@ -48,8 +66,6 @@ export class SummaryPage implements OnInit {
         title: 'Share your score',
         // eslint-disable-next-line max-len
         text: `Image Bearers on ${todayStr}: ${this.genNstars(this.dataSvc.score$())} on ${this.dataSvc.getDifficulty(this.dataSvc.gameMode$())} mode, and have a daily streak of ${this.dataSvc.getStreak()}!`,
-        // eslint-disable-next-line max-len
-        // text: `Image Bearers on ${todayStr}: ${this.genNstars(this.dataSvc.getScore())} on ${this.dataSvc.getDifficulty(this.dataSvc.getGameMode())} mode!`,
         dialogTitle: 'Share your score',
       });
     } catch (e) {
@@ -58,6 +74,17 @@ export class SummaryPage implements OnInit {
 
   saveMissedImageBearers() {
     this.dataSvc.saveMissedImageBearersToStorage();
+  }
+
+  toggleDailQuiz(ev: Event) {
+    const tev = ev as ToggleCustomEvent;
+    console.log(tev.detail.checked);
+    if (tev.detail.checked) {
+      this.mesgSvc.registerToReceiveNotifs();
+    } else {
+      // user unselected the option, so remove the token from cloud firestore.
+      this.mesgSvc.unregisterFromReceiveNotifs();
+    }
   }
 
   // '🟨';

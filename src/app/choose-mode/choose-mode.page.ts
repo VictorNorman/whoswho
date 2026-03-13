@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameDataService } from '../services/game-data.service';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonImg, IonItem, IonRow, IonButton, IonList } from "@ionic/angular/standalone";
+import { IonContent, IonImg, IonItem, IonRow, IonButton, IonList, IonSpinner } from "@ionic/angular/standalone";
 import { MessagingService } from '../services/messaging.service';
 
 @Component({
@@ -10,7 +10,7 @@ import { MessagingService } from '../services/messaging.service';
   templateUrl: './choose-mode.page.html',
   styleUrls: ['./choose-mode.page.scss'],
   standalone: true,
-  imports: [
+  imports: [IonSpinner,
     IonList, IonButton, IonRow, IonItem, IonImg, IonContent,
     FormsModule,
   ]
@@ -22,7 +22,6 @@ export class ChooseModePage implements OnInit {
 
   public gameDataSvc = inject(GameDataService);
   private router = inject(Router);
-  protected messaging = inject(MessagingService);
 
   constructor() {
   }

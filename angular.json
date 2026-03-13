@@ -41,6 +41,11 @@
                 "glob": "firebase-messaging-sw.js",
                 "input": "src",
                 "output": ""
+              },
+              {
+                "glob": "manifest.webmanifest",
+                "input": "public",
+                "output": ""
               }
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],

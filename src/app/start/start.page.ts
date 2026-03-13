@@ -41,16 +41,6 @@ export class StartPage {
     secret: [''],
   });
 
-  constructor(
-  ) {
-  }
-
-  private plat = inject(Platform);
-
-  isIOs(): boolean {
-    return this.plat.is('ios');
-  }
-
   async ngOnInit() {
     await this.storage.create();
     const organization = (await this.storage.get('organization')) || '';

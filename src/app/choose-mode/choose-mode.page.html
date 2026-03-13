@@ -2,6 +2,9 @@
   <ion-item>
     <ion-img src="assets/logo.svg"></ion-img>
   </ion-item>
+  @if (gameDataSvc.loading$()) {
+  <ion-spinner name="lines" style="width: 30%; height: 30%;" class="center"></ion-spinner>
+  } @else {
   <ion-row class="choose-daily-quiz-area ion-justify-content-around">
     <ion-button class="center" (click)="dailyQuiz()">
       Choose the daily quiz
@@ -28,13 +31,6 @@
     <ion-row class="ion-justify-content-around">
       <ion-button class="center" (click)="useCustomQuiz()">Custom Quiz</ion-button>
     </ion-row>
-    @if (! messaging.registeredForNotifs()) {
-    <ion-row class="register-for-notifs ion-justify-content-around">
-      Click 'Yes' to receive daily notifications reminding you to do the daily quiz.
-      <ion-button class="center" (click)="messaging.registerToReceiveNotifs()">
-        Yes
-      </ion-button>
-    </ion-row>
-    }
   </ion-list>
+  }
 </ion-content>
